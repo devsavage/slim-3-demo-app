@@ -1,0 +1,5 @@
+Options +FollowSymLinks
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(/)?$ public [L]
