@@ -80,20 +80,20 @@ return [
 ##### Here is a detailed version of our app/bootstrap.php file. #####
 ``` php
 <?php
-session_start(); //Start our PHP session
-define('INC_ROOT', dirname(__DIR__)); // Define our directory where all of our files are stored.
-
-require_once INC_ROOT . '/vendor/autoload.php'; // Require in our autoloader
-
-// Create our new Slim\App (I am using a modified Slim\App file for better control and more abilities)
-$site = new \Savage\Site(new \Slim\Container(
-  include '../config/container.config.php' // Include our config file
-));
-
-$site->add($site->getContainer()->csrf); // Add our csrf to the container
-$site->add(new \Savage\Http\Middleware\CsrfMiddleware($site)); // Add our csrf middleware to the container
-
-require 'routes.php'; // Add in our routes file
-
-$site->getContainer()->db->bootEloquent(); // Finally bootup our database for use
+    session_start(); //Start our PHP session
+    define('INC_ROOT', dirname(__DIR__)); // Define our directory where all of our files are stored.
+    
+    require_once INC_ROOT . '/vendor/autoload.php'; // Require in our autoloader
+    
+    // Create our new Slim\App (I am using a modified Slim\App file for better control and more abilities)
+    $site = new \Savage\Site(new \Slim\Container(
+      include '../config/container.config.php' // Include our config file
+    ));
+    
+    $site->add($site->getContainer()->csrf); // Add our csrf to the container
+    $site->add(new \Savage\Http\Middleware\CsrfMiddleware($site)); // Add our csrf middleware to the container
+    
+    require 'routes.php'; // Add in our routes file
+    
+    $site->getContainer()->db->bootEloquent(); // Finally bootup our database for use
 ```
