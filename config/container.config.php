@@ -9,6 +9,7 @@ return [
         'host' => '127.0.0.1',
         'username' => 'dev',
         'password' => 'dev',
+        'database' => 'demoapp',
         'charset' => 'utf8',
         'collation' => 'utf8_unicode_ci',
       ],
@@ -20,6 +21,10 @@ return [
 
     'user' => function() {
       return new \Savage\Http\Auth\User;
+    },
+
+    'validator' => function($c) {
+      return new \Savage\Http\Validation\Validator($c['user'], $c['util']);
     },
 
     'util' => function() {
@@ -55,7 +60,7 @@ return [
       $capsule->addConnection([
         'driver' => $c['settings']['mysql']['driver'],
         'host' => $c['settings']['mysql']['host'],
-        'database' => 'addressbook',
+        'database' => $c['settings']['mysql']['database'],
         'username' => $c['settings']['mysql']['username'],
         'password' => $c['settings']['mysql']['password'],
         'charset' => $c['settings']['mysql']['charset'],
@@ -63,5 +68,5 @@ return [
       ], 'default');
 
       return $capsule;
-    }
+    },
 ];

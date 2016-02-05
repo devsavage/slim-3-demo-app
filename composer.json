@@ -13,6 +13,7 @@
 		"hassankhan/config": "^0.9.1",
 		"slim/flash": "^0.1.0",
 		"slim/csrf": "^0.6.0",
-		"alexgarrett/violin": "^2.2"
+		"alexgarrett/violin": "^2.2",
+		"phpmailer/phpmailer": "^5.2"
     }
 }
