@@ -23,10 +23,6 @@ return [
       return new \Savage\Http\Auth\User;
     },
 
-    'validator' => function($c) {
-      return new \Savage\Http\Validation\Validator($c['user'], $c['util']);
-    },
-
     'util' => function() {
       return new \Savage\Http\Util\Utils;
     },

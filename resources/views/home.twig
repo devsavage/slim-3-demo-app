@@ -3,7 +3,7 @@
 {% block content %}
     <div class="container">
         <div class="jumbotron">
-            <h1>Welcome Home</h1>
+            <h1>Welcome home{% if auth %}, {{ auth.username }}!{% endif %}</h1>
         </div>
     </div>
 {% endblock %}

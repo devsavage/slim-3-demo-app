@@ -14,8 +14,13 @@
         <li><a href="{{ path_for('home') }}">Home</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="{{ path_for('auth.login') }}">Login</a></li>
-        <li><a href="{{ path_for('auth.register') }}">Register</a></li>
+          {% if not auth %}
+            <li><a href="{{ path_for('auth.login') }}">Login</a></li>
+            <li><a href="{{ path_for('auth.register') }}">Register</a></li>
+        {% else %}
+            <p class="navbar-text">Signed in as {{ auth.username }}</p>
+            <li><a href="{{ path_for('auth.logout') }}">Logout</a></li>
+        {% endif %}
       </ul>
     </div><!--/.nav-collapse -->
   </div>

@@ -30,7 +30,7 @@
                           <div class="col-sm-10">
                               <input type="text" class="form-control" name="username" id="username" placeholder="Username" value="{{ flash.getMessage('username').0 }}">
                               {% if errors.has('username') %}
-                                  <p class="help-block text-danger">{{ errors.first('first_name') }}</p>
+                                  <p class="help-block text-danger">{{ errors.first('username') }}</p>
                               {% endif %}
                           </div>
                       </div>
