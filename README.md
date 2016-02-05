@@ -16,4 +16,4 @@ This will install all of the required dependencies as well as autoload the other
 This work is licensed under the MIT license. See [License File](LICENSE) for more information.
 
 ## Other
-If you feel this project would suit your need, feel free to use any or all of it.  
+If you feel this project would suit your needs, feel free to use any or all of it.  
