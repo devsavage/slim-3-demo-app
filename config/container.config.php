@@ -12,7 +12,19 @@ return [
         'charset' => 'utf8',
         'collation' => 'utf8_unicode_ci',
       ],
+      'auth' => [
+        'session' => 'user_id',
+        'remember' => 'REM_TOKEN',
+      ],
     ],
+
+    'user' => function() {
+      return new \Savage\Http\Auth\User;
+    },
+
+    'util' => function() {
+      return new \Savage\Http\Util\Utils;
+    },
 
     'flash' => function() {
       return new \Slim\Flash\Messages;

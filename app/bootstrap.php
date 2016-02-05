@@ -9,8 +9,11 @@ $site = new \Savage\Site(new \Slim\Container(
 ));
 
 $site->add($site->getContainer()->csrf);
+$site->add(new \Savage\Http\Middleware\AuthMiddleware($site));
 $site->add(new \Savage\Http\Middleware\CsrfMiddleware($site));
 
 require 'routes.php';
 
 $site->getContainer()->db->bootEloquent();
+
+$site->auth = false;

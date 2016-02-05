@@ -14,3 +14,9 @@
 // })->setName('home');
 
 $site->route(['GET'], '/', \Savage\Http\Controllers\HomeController::class);
+
+$site->group('/auth', function() {
+    $this->authRoute(['GET', 'POST'], '/login', \Savage\Http\Controllers\AuthController::class, 'login');
+    $this->authRoute(['GET', 'POST'], '/register', \Savage\Http\Controllers\AuthController::class, 'register');
+});
+
