@@ -1,10 +1,9 @@
-Home
-{% if flash.getMessage('global').0 %}
-  {{ flash.getMessage('global').0 }}
-{% endif %}
+{% extends 'templates/layout.twig' %}
 
-{% if auth %}
-  Authed
-{% else %}
-Not Authed
-{% endif %}
+{% block content %}
+    <div class="container">
+        <div class="jumbotron">
+            <h1>Welcome Home</h1>
+        </div>
+    </div>
+{% endblock %}

@@ -8,7 +8,7 @@ class AuthController extends Controller {
     }
 
     public function getLogin() {
-        return 'Auth->Login';
+        return $this->render('auth/login');
     }
 
     public function postLogin() {
@@ -16,7 +16,7 @@ class AuthController extends Controller {
     }
 
     public function getRegister() {
-        return 'Auth->Register';
+        return $this->render('auth/register');
     }
 
     public function postRegister() {

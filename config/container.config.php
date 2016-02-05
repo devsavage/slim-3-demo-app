@@ -42,6 +42,8 @@ return [
         $c['request']->getUri()
       ));
 
+      $view->addExtension(new \Savage\Extension\TwigExtension);
+
       $view->getEnvironment()->addGlobal('flash', $c['flash']);
 
       return $view;
