@@ -17,6 +17,7 @@ return [
         'session' => 'user_id',
         'remember' => 'REM_TOKEN',
       ],
+      'url' => 'http://127.0.0.1/demoapp/public',
     ],
 
     'user' => function() {
@@ -64,5 +65,28 @@ return [
       ], 'default');
 
       return $capsule;
+    },
+
+    //Error Handling
+    'notAllowedHandler' => function($c) {
+        return function ($request, $response, $methods) use ($c) {
+            return $c['response']
+                ->withStatus(405)->withRedirect($c['router']->pathFor('home'));
+        };
+    },
+
+    'errorHandler' => function($c) {
+        return function ($request, $response, $methods) use ($c) {
+            return $c['response']->withStatus(500)->withHeader('Content-Type', 'text/html')->write('Something went wrong!');
+        };
+    },
+
+    'notFoundHandler' => function($c) {
+        return function ($request, $response) use ($c) {
+            return $c['response']
+                ->withStatus(404)
+                ->withHeader('Content-Type', 'text/html')
+                ->write(str_replace($c['settings']['url'], '', $request->getUri()) . " was not found on this server.");
+        };
     },
 ];

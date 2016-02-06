@@ -10,11 +10,7 @@ class BasicFilter
     public function __construct(Site $site) {
         $this->site = $site;
     }
-
-    // public function __invoke($request, $response, $next) {
-    //     return $next($request, $response);
-    // }
-
+    
     protected function getContainer() {
         return $this->site->getContainer();
     }

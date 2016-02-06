@@ -4,7 +4,6 @@ namespace Savage\Http\Controllers;
 
 class AuthController extends Controller {
     public function get() {
-
     }
 
     public function getLogin() {
@@ -120,6 +119,98 @@ class AuthController extends Controller {
                 $this->flashNow('error', 'You have some errors with your registration, please fix them and try again.');
 
                 return $this->render('auth/register', [
+                    'errors' => $validator->errors()
+                ]);
+            }
+        }
+    }
+
+    public function getSettings() {
+        return $this->render('auth/settings');
+    }
+
+    public function getProfile() {
+        return $this->redirectTo('auth.settings', "#profile");
+    }
+
+    public function postProfile() {
+        if($this->data() === null) {
+            $this->flash('error', 'Please fill out the fields!');
+            return $this->redirectTo('auth.register');
+        } else {
+            $validator = $this->getValidator();
+            $data = [
+                'first_name' => $this->data()->first_name,
+                'last_name' => $this->data()->last_name,
+                'email' => $this->data()->email,
+            ];
+
+            $validator->validate([
+                'first_name|First Name' => [$data['first_name'], 'required|max(20)'],
+                'last_name|Last Name' => [$data['last_name'], 'required|max(20)'],
+                'email|E-Mail' => [$data['email'], 'required|email|max(50)|uniqueEmail'],
+            ]);
+
+            if($validator->passes()) {
+                if($this->isLoggedIn()) {
+                    $this->getAuthUser()->update([
+                        'first_name' => $data['first_name'],
+                        'last_name' => $data['last_name'],
+                        'email' => $data['email'],
+                    ]);
+
+                    $this->flash('success', 'Your profile has been updated!');
+                    return $this->redirectTo('auth.settings', "#profile");
+                }
+
+                return $this->redirectTo('home');
+            } else {
+                $this->flashNow('error', 'There were some errors while trying to update your profile, please fix them and try again.');
+
+                return $this->render('auth/settings', [
+                    'errors' => $validator->errors()
+                ]);
+            }
+        }
+    }
+
+    public function getPassword() {
+        return $this->redirectTo('auth.settings', "#password");
+    }
+
+    public function postPassword() {
+        if($this->data() === null) {
+            $this->flash('error', 'Please fill out the fields!');
+            return $this->redirectTo('auth.register');
+        } else {
+            $validator = $this->getValidator();
+            $data = [
+                'current_password' => $this->data()->current_password,
+                'new_password' => $this->data()->new_password,
+                'confirm_new_password' => $this->data()->confirm_new_password,
+            ];
+
+            $validator->validate([
+                'current_password|Current Password' => [$data['current_password'], 'required|matchesCurrentPassword'],
+                'new_password|New Password' => [$data['new_password'], 'required|min(6)|max(75)'],
+                'confirm_new_password|Confirm New Password' => [$data['confirm_new_password'], 'required|matches(new_password)'],
+            ]);
+
+            if($validator->passes()) {
+                if($this->isLoggedIn()) {
+                    $this->getAuthUser()->update([
+                        'password' => $this->container->util->hashPassword($data['new_password']),
+                    ]);
+
+                    $this->flash('success', 'Your password has been changed!');
+                    return $this->redirectTo('auth.settings', "#password");
+                }
+
+                return $this->redirectTo('home');
+            } else {
+                $this->flashNow('error', 'There were some errors while trying to change your password, please fix them and try again.');
+
+                return $this->render('auth/settings', [
                     'errors' => $validator->errors()
                 ]);
             }

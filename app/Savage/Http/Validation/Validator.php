@@ -14,7 +14,7 @@ class Validator extends Violin
 
     public function __construct(User $user, Utils $utils, $auth = null) {
         $this->user = $user;
-        $this->hash = $utils;
+        $this->utils = $utils;
         $this->auth = $auth;
 
         $this->addFieldMessages([
@@ -27,9 +27,9 @@ class Validator extends Violin
             ]
         ]);
 
-        // $this->addRuleMessages([
-        //
-        // ]);
+        $this->addRuleMessages([
+            'matchesCurrentPassword' => 'Your current password is incorrect.',
+        ]);
     }
 
     public function validate_uniqueUsername($value, $input, $args) {
@@ -43,5 +43,13 @@ class Validator extends Violin
         }
 
         return !(bool) $user->count();
+    }
+
+    public function validate_matchesCurrentPassword($value, $input, $args) {
+        if($this->auth && $this->utils->verifyPassword($value, $this->auth->password)) {
+            return true;
+        }
+
+        return false;
     }
 }

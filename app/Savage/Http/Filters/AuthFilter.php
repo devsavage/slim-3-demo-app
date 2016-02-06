@@ -14,21 +14,9 @@ class AuthFilter extends BasicFilter
     public function __invoke($request, $response, $next) {
         if(!$this->site->auth) {
             $this->getContainer()->flash->addMessage("info", "Please login before viewing that page.");
-            $this->redirectTo($response, 'auth.login');
+            return $this->redirectTo($response, 'auth.login');
         }
 
         return $next($request, $response);
     }
-
-    // protected function getContainer() {
-    //     return $this->site->getContainer();
-    // }
-    //
-    // public function router() {
-    //     return $this->getContainer()->router;
-    // }
-    //
-    // public function redirectTo($response, $path) {
-    //     return $response->withRedirect($this->router()->pathFor($path));
-    // }
 }

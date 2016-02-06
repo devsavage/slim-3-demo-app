@@ -3,7 +3,7 @@ namespace Savage\Http\Filters;
 
 use Slim\App as Site;
 
-class GuestFilter extends BasicFilter
+class AdminFilter extends BasicFilter
 {
     protected $site;
 
@@ -12,7 +12,8 @@ class GuestFilter extends BasicFilter
     }
 
     public function __invoke($request, $response, $next) {
-        if($this->site->auth) {
+        if(!$this->site->auth || !$this->site->auth->isAdmin()) {
+            $this->getContainer()->flash->addMessage("error", "Access Denied");
             return $this->redirectTo($response, 'home');
         }
 

@@ -12,22 +12,25 @@ class Utils
         $this->_random = new RandomLib();
     }
 
+    // Hashes
     public function hash($input) {
         return hash('sha256', $input);
     }
 
     public function verifyHash($knownHash, $givenHash) {
-        return password_verify($knownHash, $givenHash);
+        return $this->hash_verify($knownHash, $givenHash);
     }
 
+    // Passwords
     public function hashPassword($password) {
-        return $this->hash_verify($password, PASSWORD_DEFAULT);
+        return password_hash($password, PASSWORD_DEFAULT);
     }
 
-    public function verifyPassword($password, $hash) {
-        return password_verify($password, $hash);
+    public function verifyPassword($givenPassword, $knownPassword) {
+        return password_verify($givenPassword, $knownPassword);
     }
 
+    // Other
     public function getMediumGen() {
         return $this->random()->getMediumStrengthGenerator();
     }

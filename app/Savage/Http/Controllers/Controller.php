@@ -2,6 +2,8 @@
 
 namespace Savage\Http\Controllers;
 
+use Savage\Http\Util\Session;
+
 class Controller
 {
     protected $request;
@@ -15,7 +17,7 @@ class Controller
     }
 
     public function render($name, array $args = []) {
-        $this->container->view->render($this->response, $name . '.twig', $args);
+        return $this->container->view->render($this->response, $name . '.twig', $args);
     }
 
     public function router() {
@@ -34,8 +36,28 @@ class Controller
         return $this->container->validator;
     }
 
-    public function redirectTo($path) {
+    public function redirectTo($path, $append = null) {
+        if($append !== null) {
+            return $this->response->withRedirect($this->router()->pathFor($path) . $append);
+        }
+
         return $this->response->withRedirect($this->router()->pathFor($path));
+    }
+
+    public function isLoggedIn() {
+        if(Session::exists($this->container->settings['auth']['session']))
+            return true;
+        else {
+            return false;
+        }
+    }
+
+    public function getAuthUser() {
+        if(Session::exists($this->container->settings['auth']['session']))
+            return $this->container->user->where('id', Session::get($this->container->settings['auth']['session']));
+        else {
+            return null;
+        }
     }
 
     public function data() {

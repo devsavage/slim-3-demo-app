@@ -1,0 +1,9 @@
+{% extends 'templates/layout.twig' %}
+
+{% block content %}
+    <div class="container">
+        <div class="jumbotron">
+            <h1>{% if auth %}{{ auth.username }} - {% endif %}Admin Center</h1>
+        </div>
+    </div>
+{% endblock %}
