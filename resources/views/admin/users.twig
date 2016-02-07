@@ -1,0 +1,39 @@
+{% extends 'templates/layout.twig' %}
+
+{% block content %}
+    <div class="container">
+        <div class="col-md-12">
+            <div class="well">
+                <h1>User List</h1>
+            </div>
+            <p>
+                <table class="table table-bordered table-striped">
+                  <thead>
+                      <tr>
+                          <th>#</th>
+                          <th>Name</th>
+                          <th>Username</th>
+                          <th>E-Mail</th>
+                          <th>Created</th>
+                          <th>Action</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for user in users %}
+                      <tr>
+                          <td>{{ user.id }}</td>
+                          <td>{{ user.getFullName }}</td>
+                          <td>{{ user.username }}</td>
+                          <td>{{ user.email }}</td>
+                          <td>{{ user.created_at|date("m/d/Y") }}</td>
+                          <td>
+                              <a class="btn btn-primary" href="{{ path_for('admin.users.edit', {id: user.id}) }}"><i class="fa fa-edit"></i></a>
+                          </td>
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+                </table>
+            </p>
+        </div>
+    </div>
+{% endblock %}

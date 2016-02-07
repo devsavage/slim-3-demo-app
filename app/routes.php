@@ -27,4 +27,8 @@ $site->group('/auth', function() {
 
 $site->group('/admin', function() {
     $this->route(['GET'], '/', \Savage\Http\Controllers\AdminController::class)->add(new \Savage\Http\Filters\AdminFilter($this))->setName('admin.home');
+
+    $this->authRoute(['GET'], '/users', \Savage\Http\Controllers\AdminController::class, 'users')->add(new \Savage\Http\Filters\AdminFilter($this))->setName('admin.users');
+
+    $this->authRoute(['GET', 'POST'], '/users/edit/{id}', \Savage\Http\Controllers\AdminController::class, 'userEdit')->add(new \Savage\Http\Filters\AdminFilter($this))->setName('admin.users.edit');
 });

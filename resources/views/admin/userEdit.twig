@@ -1,0 +1,79 @@
+{% extends 'templates/layout.twig' %}
+
+{% block content %}
+    <div class="container">
+        <div class="col-md-12">
+            <div class="page-header">
+                <h1>Editing {{ user.username }}'s Account</h1>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ user.getFullName }} ({{ user.username }})</h3>
+                </div>
+                <div class="panel-body">
+                    <form action="" method="post" class="form-horizontal" autocomplete="off">
+                        <div class="form-group {% if errors.has('first_name') or errors.has('last_name') %}has-error{% endif %}">
+                          <div class="row">
+                              <label for="first_name" class="col-md-2 control-label">Name</label>
+                              <div class="col-md-4">
+                                  <input type="text" class="form-control" name="first_name" id="first_name" placeholder="User's First Name" value="{{ user.first_name }}">
+                              </div>
+                              <div class="col-md-4">
+                                  <input type="text" class="form-control" name="last_name" id="last_name"  placeholder="User's Last Name" value="{{ user.last_name }}">
+                              </div>
+                              <div class="col-md-4">
+                                  {% if errors.has('first_name') %}
+                                      <p class="help-block text-danger">{{ errors.first('first_name') }}</p>
+                                  {% endif %}
+                                  {% if errors.has('last_name') %}
+                                      <p class="help-block text-danger">{{ errors.first('last_name') }}</p>
+                                  {% endif %}
+                              </div>
+                          </div>
+                        </div>
+                        <div class="form-group {% if errors.has('username') %}has-error{% endif %}">
+                          <div class="row">
+                              <label for="username" class="col-md-2 control-label">Username</label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control" id="username" placeholder="{{ user.username }}" disabled>
+                              </div>
+                          </div>
+                        </div>
+                        <div class="form-group {% if errors.has('email') %}has-error{% endif %}">
+                          <div class="row">
+                              <label for="email" class="col-md-2 control-label">E-Mail</label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control" name="email" placeholder="User's E-Mail" value="{{ user.email }}">
+
+                                  {% if errors.has('email') %}
+                                      <p class="help-block text-danger">{{ errors.first('email') }}</p>
+                                  {% endif %}
+                              </div>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-4 col-md-offset-4">
+                                <input type="hidden" name="csrf_name" value="{{ csrf_name }}">
+                                <input type="hidden" name="csrf_value" value="{{ csrf_token }}">
+                                <button type="submit" class="btn btn-info btn-lg btn-block" disabled><i class="fa fa-pencil"></i> Update {{ user.username }}'s Profile</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="panel-footer">
+                    <button type="button" id="deleteUser" class="btn btn-danger" style="margin-left: 80%;" disabled><i class="fa fa-ban"></i> Delete {{ user.username }}'s Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript">
+    $(function() {
+        $("#deleteUser").on('click', function(e) {
+            e.preventDefault();
+            // TODO: Complete the ajax POST request to delete the user and send us back to user list within a SweetAlert...
+        });
+    });
+</script>
+{% endblock %}
