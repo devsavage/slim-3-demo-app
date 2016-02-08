@@ -24,6 +24,10 @@ class Validator extends Violin
 
             'email' => [
                 'uniqueEmail' => 'This e-mail is already in use.',
+            ],
+
+            'confirm_new_password' => [
+                'matches' => 'Confirm New Password must match New Password.',
             ]
         ]);
 

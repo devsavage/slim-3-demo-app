@@ -8,7 +8,7 @@ class User extends Eloquent
 {
     protected $table = 'users';
 
-    protected $fillable = ['first_name', 'last_name', 'username', 'email', 'password', 'remember_identifier', 'remember_token'];
+    protected $fillable = ['first_name', 'last_name', 'username', 'email', 'password', 'remember_identifier', 'remember_token', 'active'];
 
     public function getFullName() {
         return "{$this->first_name} {$this->last_name}";

@@ -75,11 +75,11 @@ return [
         };
     },
 
-    'errorHandler' => function($c) {
-        return function ($request, $response, $methods) use ($c) {
-            return $c['response']->withStatus(500)->withHeader('Content-Type', 'text/html')->write('Something went wrong!');
-        };
-    },
+    // 'errorHandler' => function($c) {
+    //     return function ($request, $response, $methods) use ($c) {
+    //         return $c['response']->withStatus(500)->withHeader('Content-Type', 'text/html')->write('Something went wrong!');
+    //     };
+    // },
 
     'notFoundHandler' => function($c) {
         return function ($request, $response) use ($c) {
@@ -89,4 +89,25 @@ return [
                 ->write(str_replace($c['settings']['url'], '', $request->getUri()) . " was not found on this server.");
         };
     },
+
+    'csrf' => function($c) {
+        $guard = new \Slim\Csrf\Guard();
+
+        $guard->setFailureCallable(function ($request, $response, $next) {
+            $request = $request->withAttribute("csrf_status", false);
+            if ($request->getAttribute('csrf_status') === false) {
+                $data = [
+                    'status' => 400,
+                    'error' => 'Bad Request',
+                    'message' => "Failed CSRF Check"
+                ];
+
+                return $response->withStatus(400)->withHeader('Content-Type', 'text/html')->write(json_encode($data));
+            } else {
+                return $next($request, $response);
+            }
+        });
+
+        return $guard;
+    }
 ];

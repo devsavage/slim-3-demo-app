@@ -29,6 +29,120 @@ class AdminController extends Controller
     }
 
     public function postUserEdit() {
-        return 'postUserEdit';
+        $id = $this->request->getAttribute('id');
+        $user = $this->container->user->where('id', $id)->first();
+        $validator = $this->getValidator();
+
+        if(!$user) {
+            $this->flash('info', "User not found");
+            return $this->redirectToUrl('admin.users');
+        }
+
+        if($this->data() == null) {
+            $this->flash('info', "User data was null");
+            return $this->redirectTo('admin.users');
+        }
+
+        $first_name = $this->data()->first_name;
+        $last_name = $this->data()->last_name;
+        $email = $this->data()->email;
+
+        $validator->validate([
+            'first_name|First Name' => [$first_name, 'required|max(20)'],
+            'last_name|Last Name' => [$last_name, 'required|max(20)'],
+            'email|E-Mail' => [$email, 'required|email|max(50)'],
+        ]);
+
+        if($validator->passes()) {
+            $user->update([
+                'first_name' => $first_name,
+                'last_name' => $last_name,
+                'email' => $email,
+            ]);
+
+            $this->flash("success", "{$user->username}'s account has been updated!");
+            return $this->redirectTo('admin.users.edit', ['id' => $id]);
+        } else {
+            $this->flashNow('error', "There were some errors while trying to update {$user->username}'s profile, please fix them and try again.");
+
+            return $this->render('admin/userEdit', [
+                'user' => $user,
+                'errors' => $validator->errors()
+            ]);
+        }
+    }
+
+    public function postUserBan() {
+        $id = $this->request->getAttribute('id');
+        $user = $this->container->user->where('id', $id)->first();
+
+        if(!$user) {
+            $data = [
+                'status' => 404,
+                'error' => "Not Found",
+                'message' => "User with id {$id} does not exist"
+            ];
+
+            return $this->response->withStatus(404)->withHeader('Content-type', 'application/json')->write(json_encode($data));
+        }
+
+        if(!(bool)$user->active) {
+            $data = [
+                'status' => 400,
+                'error' => 'Bad Request',
+                'message' => "{$user->username}'s account is already banned."
+            ];
+
+            return $this->response->withStatus(400)->withHeader('Content-type', 'application/json')->write(json_encode($data));
+        } else {
+
+            $user->update([
+                'active' => false
+            ]);
+
+            $data = [
+                'status' => 200,
+                'message' => "{$user->username}'s account has been banned."
+            ];
+
+            return $this->response->withStatus(200)->withHeader('Content-type', 'application/json')->write(json_encode($data));
+        }
+    }
+
+    public function postUserActivate() {
+        $id = $this->request->getAttribute('id');
+        $user = $this->container->user->where('id', $id)->first();
+
+        if(!$user) {
+            $data = [
+                'status' => 404,
+                'error' => "Not Found",
+                'message' => "User with id {$id} does not exist"
+            ];
+
+            return $this->response->withStatus(404)->withHeader('Content-type', 'application/json')->write(json_encode($data));
+        }
+
+        if((bool)$user->active) {
+            $data = [
+                'status' => 400,
+                'error' => 'Bad Request',
+                'message' => "{$user->username}'s account is already activated."
+            ];
+
+            return $this->response->withStatus(400)->withHeader('Content-type', 'application/json')->write(json_encode($data));
+        } else {
+
+            $user->update([
+                'active' => true
+            ]);
+
+            $data = [
+                'status' => 200,
+                'message' => "{$user->username}'s account has been activated."
+            ];
+
+            return $this->response->withStatus(200)->withHeader('Content-type', 'application/json')->write(json_encode($data));
+        }
     }
 }

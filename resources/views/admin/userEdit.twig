@@ -3,6 +3,11 @@
 {% block content %}
     <div class="container">
         <div class="col-md-12">
+            <ol class="breadcrumb">
+              <li><a href="{{ path_for('admin.home') }}">Home</a></li>
+              <li><a href="{{ path_for('admin.users') }}">User List</a></li>
+              <li class="active">Edit {{ user.username }}</li>
+            </ol>
             <div class="page-header">
                 <h1>Editing {{ user.username }}'s Account</h1>
             </div>
@@ -17,14 +22,12 @@
                               <label for="first_name" class="col-md-2 control-label">Name</label>
                               <div class="col-md-4">
                                   <input type="text" class="form-control" name="first_name" id="first_name" placeholder="User's First Name" value="{{ user.first_name }}">
-                              </div>
-                              <div class="col-md-4">
-                                  <input type="text" class="form-control" name="last_name" id="last_name"  placeholder="User's Last Name" value="{{ user.last_name }}">
-                              </div>
-                              <div class="col-md-4">
                                   {% if errors.has('first_name') %}
                                       <p class="help-block text-danger">{{ errors.first('first_name') }}</p>
                                   {% endif %}
+                              </div>
+                              <div class="col-md-4">
+                                  <input type="text" class="form-control" name="last_name" id="last_name"  placeholder="User's Last Name" value="{{ user.last_name }}">
                                   {% if errors.has('last_name') %}
                                       <p class="help-block text-danger">{{ errors.first('last_name') }}</p>
                                   {% endif %}
@@ -55,13 +58,23 @@
                             <div class="col-md-4 col-md-offset-4">
                                 <input type="hidden" name="csrf_name" value="{{ csrf_name }}">
                                 <input type="hidden" name="csrf_value" value="{{ csrf_token }}">
-                                <button type="submit" class="btn btn-info btn-lg btn-block" disabled><i class="fa fa-pencil"></i> Update {{ user.username }}'s Profile</button>
+                                <button type="submit" class="btn btn-info btn-lg btn-block"><i class="fa fa-pencil"></i> Update {{ user.username }}'s Profile</button>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="panel-footer">
-                    <button type="button" id="deleteUser" class="btn btn-danger" style="margin-left: 80%;" disabled><i class="fa fa-ban"></i> Delete {{ user.username }}'s Account</button>
+                    <div class="pull-right">
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="btn-group" role="group">
+                                <button type="button" id="activateUser" data-toggle="tooltip" data-placement="left" title="Activate" class="btn btn-success" {% if user.active %}disabled{% endif %}><i class="fa fa-check"></i> </button>
+                            </div>
+                            <div class="btn-group" role="group">
+                                <button type="button" id="banUser" data-toggle="tooltip" data-placement="right" title="Ban" class="btn btn-danger" {% if not user.active %}disabled{% endif %}><i class="fa fa-ban"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
                 </div>
             </div>
         </div>
@@ -70,9 +83,135 @@
 {% block scripts %}
 <script type="text/javascript">
     $(function() {
-        $("#deleteUser").on('click', function(e) {
+        $('#activateUser').tooltip();
+        $('#banUser').tooltip();
+        $("#banUser").on('click', function(e) {
             e.preventDefault();
-            // TODO: Complete the ajax POST request to delete the user and send us back to user list within a SweetAlert...
+
+            swal({
+                title: 'Are you sure?',
+                text: 'If you click yes, {{ user.username }}\'s account will be banned!',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#2196F3',
+                cancelButtonColor: '#F44336',
+                confirmButtonText: 'Yes, ban {{ user.username }}',
+                cancelButtonText: 'Nevermind',
+                closeOnConfirm: false,
+                closeOnCancel: false
+            }, function(isConfirm) {
+                if(isConfirm) {
+                    $.ajax({
+                        url: "{{ path_for('admin.users.ban', {id: user.id}) }}",
+                        type: "POST",
+                        dataType: "json",
+                        data: {
+                            "csrf_name": "{{ csrf_name }}",
+                            "csrf_value": "{{ csrf_token }}"
+                        }
+                    }).success(function(data) {
+                        swal({
+                            title: 'Banned',
+                            text: data.message,
+                            type: 'success',
+                            timer: 5000
+                        }, function(isConfirm) {
+                            // We need to reload to regenerate our CSRF tokens
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 100);
+                        });
+                    }).error(function(data) {
+                        var res = $.parseJSON(data.responseText);
+                        swal({
+                            title: res.status + " (" + res.error + ")",
+                            text: res.message,
+                            type: 'error',
+                            timer: 5000
+                        }, function(isConfirm) {
+                            // We need to reload to regenerate our CSRF tokens
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 100);
+                        });
+                    });
+
+                    // We need to reload to regenerate our CSRF tokens and update our button on success or error
+                    setTimeout(function() {
+                        location.reload();
+                    }, 6000);
+                } else {
+                    swal({
+                        title: 'Cancelled',
+                        html: '<b>{{ user.username }}</b>\'s account will not be banned',
+                        type: 'error',
+                        timer: 5000
+                    });
+                }
+            });
+        });
+
+        $("#activateUser").on('click', function(e) {
+            e.preventDefault();
+
+            swal({
+                title: 'Are you sure?',
+                text: 'If you click yes, {{ user.username }}\'s account will be activated!',
+                type: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#2196F3',
+                cancelButtonColor: '#F44336',
+                confirmButtonText: 'Activate {{ user.username }}',
+                cancelButtonText: 'Nevermind',
+                closeOnConfirm: false,
+                closeOnCancel: false
+            }, function(isConfirm) {
+                if(isConfirm) {
+                    $.ajax({
+                        url: "{{ path_for('admin.users.activate', {id: user.id}) }}",
+                        type: "POST",
+                        dataType: "json",
+                        data: {
+                            "csrf_name": "{{ csrf_name }}",
+                            "csrf_value": "{{ csrf_token }}"
+                        }
+                    }).success(function(data) {
+                        swal({
+                            title: 'Activated',
+                            text: data.message,
+                            type: 'success',
+                            timer: 5000
+                        }, function(isConfirm) {
+                            // We need to reload to regenerate our CSRF tokens
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 100);
+                        });
+                    }).error(function(data) {
+                        var res = $.parseJSON(data.responseText);
+                        swal({
+                            title: res.status + " (" + res.error + ")",
+                            text: res.message,
+                            type: 'error',
+                            timer: 5000
+                        }, function(isConfirm) {
+                            // We need to reload to regenerate our CSRF tokens
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 100);
+                        });
+                    });
+
+                } else {
+                    swal({
+                        title: 'Cancelled',
+                        html: '<b>{{ user.username }}</b>\'s account will not be activated',
+                        type: 'error',
+                        timer: 5000
+                    }, function(isConfirm) {
+                    });
+                }
+            });
         });
     });
 </script>

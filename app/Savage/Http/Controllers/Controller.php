@@ -36,12 +36,20 @@ class Controller
         return $this->container->validator;
     }
 
-    public function redirectTo($path, $append = null) {
+    public function redirectTo($path, $urlParams = null, $append = null) {
         if($append !== null) {
             return $this->response->withRedirect($this->router()->pathFor($path) . $append);
         }
 
+        if($urlParams !== null) {
+            return $this->response->withRedirect($this->router()->pathFor($path, $urlParams));
+        }
+
         return $this->response->withRedirect($this->router()->pathFor($path));
+    }
+
+    public function redirectToUrl($url) {
+        return $this->response->withRedirect($url);
     }
 
     public function isLoggedIn() {

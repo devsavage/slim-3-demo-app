@@ -38,6 +38,9 @@ class AuthController extends Controller {
                     return $this->render('auth/login', [
                         'errors' => $validator->errors()
                     ]);
+                } else if($user && !(bool) $user->active) {
+                    $this->flash('error', 'Your account is banned.');
+                    return $this->redirectTo('auth.login');
                 } else if($user && $this->container->util->verifyPassword($data['password'], $user->password)) {
                     \Savage\Http\Util\Session::set($this->container->settings['auth']['session'], $user->id);
 
@@ -130,7 +133,7 @@ class AuthController extends Controller {
     }
 
     public function getProfile() {
-        return $this->redirectTo('auth.settings', "#profile");
+        return $this->redirectTo('auth.settings', null, "#profile");
     }
 
     public function postProfile() {
@@ -160,7 +163,7 @@ class AuthController extends Controller {
                     ]);
 
                     $this->flash('success', 'Your profile has been updated!');
-                    return $this->redirectTo('auth.settings', "#profile");
+                    return $this->redirectTo('auth.settings', null, "#profile");
                 }
 
                 return $this->redirectTo('home');
@@ -175,7 +178,7 @@ class AuthController extends Controller {
     }
 
     public function getPassword() {
-        return $this->redirectTo('auth.settings', "#password");
+        return $this->redirectTo('auth.settings', null, "#password");
     }
 
     public function postPassword() {
@@ -203,7 +206,7 @@ class AuthController extends Controller {
                     ]);
 
                     $this->flash('success', 'Your password has been changed!');
-                    return $this->redirectTo('auth.settings', "#password");
+                    return $this->redirectTo('auth.settings', null, "#password");
                 }
 
                 return $this->redirectTo('home');

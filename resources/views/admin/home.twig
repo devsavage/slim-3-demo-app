@@ -2,11 +2,28 @@
 
 {% block content %}
     <div class="container">
-        <div class="jumbotron">
-            <h1>{% if auth %}{{ auth.username }} - {% endif %}Admin Center</h1>
-            <p>
-                
-            </p>
+        <div class="col-md-12">
+            <ol class="breadcrumb">
+              <li class="active">Home</li>
+            </ol>
+        </div>
+        <div class="col-md-8">
+            <div class="well">
+                <h1>Admin Center</h1>
+                <hr>
+                <p>
+                    Welcome to the admin center, {{ auth.username }}
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="well">
+                <h1>Actions</h1>
+                <hr>
+                <p>
+                    <a href="{{ path_for('admin.users') }}" class="btn btn-lg btn-success btn-block">View User List</a>
+                </p>
+            </div>
         </div>
     </div>
 {% endblock %}
