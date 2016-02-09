@@ -145,4 +145,33 @@ class AdminController extends Controller
             return $this->response->withStatus(200)->withHeader('Content-type', 'application/json')->write(json_encode($data));
         }
     }
+
+    public function postUserDelete() {
+        // To be safe
+        static $username;
+
+        $id = $this->request->getAttribute('id');
+        $user = $this->container->user->where('id', $id)->first();
+
+        if(!$user) {
+            $data = [
+                'status' => 404,
+                'error' => "Not Found",
+                'message' => "User with id {$id} either does not exist or they may be deleted."
+            ];
+
+            return $this->response->withStatus(404)->withHeader('Content-type', 'application/json')->write(json_encode($data));
+        } else {
+            $username = $user->username;
+
+            $user->delete();
+
+            $data = [
+                'status' => 200,
+                'message' => "{$username}'s account has been deleted."
+            ];
+
+            return $this->response->withStatus(200)->withHeader('Content-type', 'application/json')->write(json_encode($data));
+        }
+    }
 }

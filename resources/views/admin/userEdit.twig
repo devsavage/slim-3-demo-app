@@ -16,6 +16,11 @@
                     <h3 class="panel-title">{{ user.getFullName }} ({{ user.username }})</h3>
                 </div>
                 <div class="panel-body">
+                    {% if not user.active %}
+                    <div class="alert alert-warning" role="alert">
+                      <strong>Heads up!</strong> This user is banned!
+                    </div>
+                    {% endif %}
                     <form action="" method="post" class="form-horizontal" autocomplete="off">
                         <div class="form-group {% if errors.has('first_name') or errors.has('last_name') %}has-error{% endif %}">
                           <div class="row">
@@ -70,8 +75,13 @@
                                 <button type="button" id="activateUser" data-toggle="tooltip" data-placement="left" title="Activate" class="btn btn-success" {% if user.active %}disabled{% endif %}><i class="fa fa-check"></i> </button>
                             </div>
                             <div class="btn-group" role="group">
-                                <button type="button" id="banUser" data-toggle="tooltip" data-placement="right" title="Ban" class="btn btn-danger" {% if not user.active %}disabled{% endif %}><i class="fa fa-ban"></i></button>
+                                <button type="button" id="banUser" data-toggle="tooltip" data-placement="top" title="Ban" class="btn btn-warning" {% if not user.active %}disabled{% endif %}><i class="fa fa-ban"></i></button>
                             </div>
+                            {% if not user.id is same as(auth.id) %}
+                            <div class="btn-group" role="group">
+                                <button type="button" id="deleteUser" data-toggle="tooltip" data-placement="right" title="Delete" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="clearfix"></div>
@@ -85,6 +95,64 @@
     $(function() {
         $('#activateUser').tooltip();
         $('#banUser').tooltip();
+        $('#deleteUser').tooltip();
+        // This could be so much more simpler.....
+        $("#deleteUser").on('click', function(e) {
+            e.preventDefault();
+            swal({
+                title: 'Are you sure?',
+                text: 'If you click yes, {{ user.username }}\'s account will be deleted!',
+                type: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#2196F3',
+                cancelButtonColor: '#F44336',
+                confirmButtonText: 'Yes, delete {{ user.username }}',
+                cancelButtonText: 'Nevermind',
+                closeOnConfirm: false,
+                closeOnCancel: false,
+                allowEscapeKey: false
+            }, function(isConfirm) {
+                if(isConfirm) {
+                    $.ajax({
+                        url: "{{ path_for('admin.users.delete', {id: user.id}) }}",
+                        type: "POST",
+                        dataType: "json",
+                        data: {
+                            "csrf_name": "{{ csrf_name }}",
+                            "csrf_value": "{{ csrf_token }}"
+                        }
+                    }).success(function(data) {
+                        swal({
+                            title: 'Deleted',
+                            text: data.message,
+                            type: 'success',
+                            timer: 5000
+                        }, function(isConfirm) {
+                            // Don't use this.
+                            redirectToUserList();
+                        });
+                    }).error(function(data) {
+                        var res = $.parseJSON(data.responseText);
+                        swal({
+                            title: res.status + " (" + res.error + ")",
+                            text: res.message,
+                            type: 'error',
+                            timer: 5000
+                        }, function(isConfirm) {
+                            reload(100);
+                        });
+                    });
+                } else {
+                    swal({
+                        title: 'Cancelled',
+                        text: '<b>{{ user.username }}</b>\'s account will not be banned',
+                        html: true,
+                        type: 'error',
+                        timer: 5000
+                    });
+                }
+            });
+        });
         $("#banUser").on('click', function(e) {
             e.preventDefault();
 
@@ -116,10 +184,7 @@
                             type: 'success',
                             timer: 5000
                         }, function(isConfirm) {
-                            // We need to reload to regenerate our CSRF tokens
-                            setTimeout(function() {
-                                window.location.reload();
-                            }, 100);
+                            reload(100);
                         });
                     }).error(function(data) {
                         var res = $.parseJSON(data.responseText);
@@ -129,21 +194,14 @@
                             type: 'error',
                             timer: 5000
                         }, function(isConfirm) {
-                            // We need to reload to regenerate our CSRF tokens
-                            setTimeout(function() {
-                                window.location.reload();
-                            }, 100);
+                            reload(100);
                         });
                     });
-
-                    // We need to reload to regenerate our CSRF tokens and update our button on success or error
-                    setTimeout(function() {
-                        location.reload();
-                    }, 6000);
                 } else {
                     swal({
                         title: 'Cancelled',
-                        html: '<b>{{ user.username }}</b>\'s account will not be banned',
+                        text: '<b>{{ user.username }}</b>\'s account will not be banned',
+                        html: true,
                         type: 'error',
                         timer: 5000
                     });
@@ -182,10 +240,7 @@
                             type: 'success',
                             timer: 5000
                         }, function(isConfirm) {
-                            // We need to reload to regenerate our CSRF tokens
-                            setTimeout(function() {
-                                window.location.reload();
-                            }, 100);
+                            reload(100);
                         });
                     }).error(function(data) {
                         var res = $.parseJSON(data.responseText);
@@ -195,17 +250,15 @@
                             type: 'error',
                             timer: 5000
                         }, function(isConfirm) {
-                            // We need to reload to regenerate our CSRF tokens
-                            setTimeout(function() {
-                                window.location.reload();
-                            }, 100);
+                            reload(100);
                         });
                     });
 
                 } else {
                     swal({
                         title: 'Cancelled',
-                        html: '<b>{{ user.username }}</b>\'s account will not be activated',
+                        text: '<b>{{ user.username }}</b>\'s account will not be activated',
+                        html: true,
                         type: 'error',
                         timer: 5000
                     }, function(isConfirm) {
@@ -214,5 +267,15 @@
             });
         });
     });
+
+    function reload(time) {
+        setTimeout(function() {
+            window.location.reload();
+        }, time);
+    }
+    // Don't use this.
+    function redirectToUserList() {
+        window.location = "http://127.0.0.1/demoapp/public/admin/users";
+    }
 </script>
 {% endblock %}

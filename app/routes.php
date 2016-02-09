@@ -35,4 +35,6 @@ $site->group('/admin', function() {
     $this->authRoute(['POST'], '/users/edit/{id}/activate', \Savage\Http\Controllers\AdminController::class, 'userActivate')->add(new \Savage\Http\Filters\AdminFilter($this))->setName('admin.users.activate');
 
     $this->authRoute(['POST'], '/users/edit/{id}/ban', \Savage\Http\Controllers\AdminController::class, 'userBan')->add(new \Savage\Http\Filters\AdminFilter($this))->setName('admin.users.ban');
+
+    $this->authRoute(['POST'], '/users/edit/{id}/delete', \Savage\Http\Controllers\AdminController::class, 'userDelete')->add(new \Savage\Http\Filters\AdminFilter($this))->setName('admin.users.delete');
 });
