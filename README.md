@@ -15,7 +15,11 @@ Then run the following in the folder **composer.json** is located.
 ```bash
 $ composer install
 ```
-This will install all of the required dependencies as well as autoload the other necessary files.
+This will install all of the required dependencies as well as autoload the other necessary files.  
+You will need to update the config file to suit your needs.  You can find the config file in **config/container.config.php**  
+You will also need to create the databases. After you setup your database info in the config, you can run the SQL files in the sql folder.  
+Once your database is set up, you can register for an account on the site.  
+You will manually need to give yourself administrator privilages by using a database manager, such as phpMyAdmin, and updating: **permissions->is_admin** and set it to **1**.  
 
 ## Framework
 Here is a list of most of the packages that make this app work.

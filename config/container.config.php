@@ -7,8 +7,8 @@ return [
       'mysql' => [
         'driver' => 'mysql',
         'host' => '127.0.0.1',
-        'username' => 'dev',
-        'password' => 'dev',
+        'username' => 'root',
+        'password' => '',
         'database' => 'demoapp',
         'charset' => 'utf8',
         'collation' => 'utf8_unicode_ci',
@@ -102,7 +102,7 @@ return [
                     'message' => "Failed CSRF Check"
                 ];
 
-                return $response->withStatus(400)->withHeader('Content-Type', 'text/html')->write(json_encode($data));
+                return $response->withStatus(400)->withHeader('Content-Type', 'application/json')->write(json_encode($data));
             } else {
                 return $next($request, $response);
             }

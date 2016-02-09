@@ -1,0 +1,1 @@
+-- Add relations between all tables that connect with a user_id so when we add the ability to delete a user, it will delete all data connected with it.
