@@ -70,6 +70,7 @@
                 </div>
                 <div class="panel-footer">
                     <div class="pull-right">
+                        {% if not user.id is same as(auth.id) %}
                         <div class="btn-toolbar" role="toolbar">
                             <div class="btn-group" role="group">
                                 <button type="button" id="activateUser" data-toggle="tooltip" data-placement="left" title="Activate" class="btn btn-success" {% if user.active %}disabled{% endif %}><i class="fa fa-check"></i> </button>
@@ -77,12 +78,14 @@
                             <div class="btn-group" role="group">
                                 <button type="button" id="banUser" data-toggle="tooltip" data-placement="top" title="Ban" class="btn btn-warning" {% if not user.active %}disabled{% endif %}><i class="fa fa-ban"></i></button>
                             </div>
-                            {% if not user.id is same as(auth.id) %}
+
                             <div class="btn-group" role="group">
                                 <button type="button" id="deleteUser" data-toggle="tooltip" data-placement="right" title="Delete" class="btn btn-danger"><i class="fa fa-trash"></i></button>
                             </div>
-                            {% endif %}
                         </div>
+                        {% else %}
+                            <span class="text-info">No additional actions can be made for this user.</span>
+                        {% endif %}
                     </div>
                     <div class="clearfix"></div>
                 </div>

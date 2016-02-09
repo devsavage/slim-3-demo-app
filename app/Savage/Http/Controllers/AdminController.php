@@ -157,7 +157,7 @@ class AdminController extends Controller
             $data = [
                 'status' => 404,
                 'error' => "Not Found",
-                'message' => "User with id {$id} either does not exist or they may be deleted."
+                'message' => "User with id {$id} either does not exist or they may have been deleted."
             ];
 
             return $this->response->withStatus(404)->withHeader('Content-type', 'application/json')->write(json_encode($data));
