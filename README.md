@@ -1,13 +1,14 @@
 # Slim 3 Demo App
-This application will try to use most features of Slim 3 as well as implement a few helpers along the way.  
+Well, basically this project is a basic Slim 3 application with authentication.   
 I am using Eloquent ORM for the database implementation. You can read more about Eloquent ORM [here](https://laravel.com/docs/master/eloquent).  
+I will continue to add more features as I see fit, soon.
 
 
 ## Current and Planned Features
 | Feature        | Description           | Status  |
 | ------------- |:-------------:| -----:|
-| CSRF Protection      | Cross-Site Request Forgery protection | Feature Complete |
-| Authenticatuion      | A fully featured authentication system | In Progress |
+| CSRF Protection      | Cross-Site Request Forgery protection. | Feature Complete |
+| Authenticatuion      | A fully featured authentication system. | Feature Complete |
 
 ## Installation
 You will need to use [Composer](https://getcomposer.org/) as well as PHP 5.5 or newer.  
@@ -22,7 +23,7 @@ $ composer install
 + You will manually need to give yourself administrator privilages by using a database manager, such as phpMyAdmin, and updating: **permissions->is_admin** and set it to **1**.  
 
 ## Configurartion
-Here is an example configuration file. You will want to place this file in a **config** folder as a php file.  
+Here is an example configuration file. You will want to place this file in a **config** folder as a php file. I reccommend naming it **container.config.php** so you won't need to update anything in the bootstrap file.  
 You will need to update **app/bootstrap.php** with the location to your config file within the instantiation of the **Slim/App** class.  
 
 ```php
