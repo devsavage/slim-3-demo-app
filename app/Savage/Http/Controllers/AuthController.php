@@ -48,7 +48,7 @@ class AuthController extends Controller {
                         $rememberIdentifier = $this->container->util->genAlnumString(128);
                         $rememberToken = $this->container->util->genAlnumString(128);
 
-                        $user->updateRememberCredentials($rememberIdentifier, $rememberToken);
+                        $user->updateRememberCredentials($rememberIdentifier, $this->container->util->hash($rememberToken));
 
                         \Savage\Http\Util\Cookie::set($this->container->settings['auth']['remember'], "{$rememberIdentifier}.{$rememberToken}", \Carbon\Carbon::now()->addWeek(2)->timestamp);
                     }

@@ -17,6 +17,8 @@ class AuthMiddleware
     public function __invoke($request, $response, $next) {
         $view = $this->site->getContainer()->view->getEnvironment();
 
+        $this->checkRememberStatus($response);
+
         if(Session::exists($this->site->getContainer()->settings['auth']['session'])) {
             $this->site->auth = $this->site->getContainer()->user->where(
                 'id',
@@ -28,12 +30,10 @@ class AuthMiddleware
 
         $view->addGlobal('auth', $this->site->auth);
 
-        $this->checkRememberStatus($response);
-
         return $next($request, $response);
     }
-
-    // I think this does not work.. but why? -- IT SHOULD NOW --- just needed to return the redirect
+    
+    // This works now :)
     protected function checkRememberStatus($response) {
         if(Cookie::exists($this->site->getContainer()->settings['auth']['remember']) && !$this->site->auth) {
             $data = Cookie::get($this->site->getContainer()->settings['auth']['remember']);
@@ -60,7 +60,6 @@ class AuthMiddleware
     }
 
     protected function checkAccountStatus($response) {
-        // This will run only when the user is logged in, we check this when they log in as well.
         if($this->site->auth) {
             $user = $this->site->auth;
 

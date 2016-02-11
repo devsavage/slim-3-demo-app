@@ -7,7 +7,7 @@
                 <div class="panel-heading">Login</div>
                 <div class="panel-body">
                   <form method="post" action="{{ path_for('auth.login') }}">
-                      <div class="form-group {% if errors.has('username') %}has-error{% endif %}">
+                      <div class="form-group {% if errors.has('identifier') %}has-error{% endif %}">
                           <div class="input-group">
                               <span class="input-group-addon" ><i class="fa fa-user"></i></span>
                               <input type="text" class="form-control" name="identifier" placeholder="E-Mail or Username" value="{{ flash.getMessage('identifier').0 }}">
