@@ -23,3 +23,7 @@ require 'routes.php';
 $site->getContainer()->db->bootEloquent();
 
 $site->auth = false;
+
+$container['site'] = function($c) use ($site) {
+    return $site;
+};

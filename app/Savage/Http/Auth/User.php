@@ -10,12 +10,18 @@ class User extends Eloquent
 
     protected $fillable = ['first_name', 'last_name', 'username', 'email', 'password', 'remember_identifier', 'remember_token', 'active'];
 
+    protected $hidden = ['password', 'remember_identifier', 'remember_token'];
+
     public function getFullName() {
         return "{$this->first_name} {$this->last_name}";
     }
 
     public function permissions() {
         return $this->hasOne('Savage\Http\Auth\Permission\UserPermissions', 'user_id');
+    }
+
+    public function notifications() {
+        return $this->hasMany('Savage\Http\Auth\User\UserNotifications', 'user_id');
     }
 
     public function hasPermission($permission) {

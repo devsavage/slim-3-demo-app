@@ -1,6 +1,7 @@
 <?php
 
 $site->route(['GET'], '/', \Savage\Http\Controllers\HomeController::class)->setName('home');
+$site->authRoute(['GET'], '/tests', \Savage\Http\Controllers\TestController::class, 'index')->setName('tests');
 
 $site->get('/auth/logout', function($request, $response, $args) use ($site) {
     \Savage\Http\Util\Session::delete($site->getContainer()->settings['auth']['session']);
@@ -40,4 +41,8 @@ $site->group('/admin', function() {
 
     $this->authRoute(['POST'], '/users/edit/{id}/promote/{type}', \Savage\Http\Controllers\AdminController::class, 'userPromote')->add(new \Savage\Http\Filters\HeadAdminFilter($this, true))->setName('admin.users.promote');
     $this->authRoute(['POST'], '/users/edit/{id}/demote/{type}', \Savage\Http\Controllers\AdminController::class, 'userDemote')->add(new \Savage\Http\Filters\HeadAdminFilter($this, true))->setName('admin.users.demote');
+});
+
+$site->group('/api', function() {
+    $this->authRoute(['GET'], '/notifications', Savage\Http\Controllers\ApiController::class, 'notifications')->setName('api.notifications');
 });
