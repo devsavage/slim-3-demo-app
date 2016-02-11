@@ -151,6 +151,7 @@ Here is a list of most of the packages that make this app work.
 + [Slim/Flash](https://packagist.org/packages/slim/flash)
     - 0.1.0
     - Extension to Slim. This allows us to show messages until we refresh a page.
+    - I use a slightly modified version of this so I can flash message now for the current request. See [this](https://github.com/slimphp/Slim-Flash/pull/14) for more details.  
 + [Slim/CSRF](http://assemble.io)
     - 0.6.0
     - Extension to Slim. This allows us to implement Cross-Site Request Forgery protection.
