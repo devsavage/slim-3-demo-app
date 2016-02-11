@@ -20,7 +20,7 @@ $ composer install
 + You will need to update the config file to suit your needs.  You can find the config file in **config/container.config.php**  
 + You will also need to create the databases. After you setup your database info in the config, you can run the SQL files in the sql folder.  
 + Once your database is set up, you can register for an account on the site.  
-+ You will manually need to give yourself administrator privilages by using a database manager, such as phpMyAdmin, and updating: **permissions->is_admin** and set it to **1**.  
++ You will manually need to give yourself administrator privilages by using a database manager, such as phpMyAdmin, and updating: **permissions->is_head_admin** and set it to **1**.  
 
 ## Configurartion
 Here is an example configuration file. You will want to place this file in a **config** folder as a php file. I reccommend naming it **container.config.php** so you won't need to update anything in the bootstrap file.  

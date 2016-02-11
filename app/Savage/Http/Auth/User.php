@@ -26,6 +26,25 @@ class User extends Eloquent
         return $this->hasPermission('is_admin');
     }
 
+    public function promoteAdmin() {
+        return $this->permissions()->update([
+            'is_admin' => true,
+        ]);
+    }
+
+    public function demoteAdmin() {
+        return $this->permissions()->update([
+            'is_admin' => false,
+        ]);
+    }
+
+    /**
+     * I guess this could be optional.. this persion can promote/demote administratiors
+     */
+    public function isHeadAdmin() {
+        return $this->hasPermission('is_head_admin');
+    }
+
     public function updateRememberCredentials($identifier, $token) {
         $this->update([
           'remember_identifier' => $identifier,

@@ -69,6 +69,17 @@
                     </form>
                 </div>
                 <div class="panel-footer">
+                    {% if not user.id is same as(auth.id) %}
+                    {% if auth.isHeadAdmin and not user.isAdmin %}
+                    <div class="pull-left">
+                      <button type="button" id="promote" data-toggle="tooltip" data-placement="top" title="Promote to Admin" class="btn btn-info"><i class="fa fa-globe"></i></button>
+                    </div>
+                    {% elseif auth.isHeadAdmin and user.isAdmin %}
+                    <div class="pull-left">
+                      <button type="button" id="demote" data-toggle="tooltip" data-placement="top" title="Demote from Admin" class="btn btn-warning"><i class="fa fa-globe"></i></button>
+                    </div>
+                    {% endif %}
+                    {% endif %}
                     <div class="pull-right">
                         {% if not user.id is same as(auth.id) %}
                         <div class="btn-toolbar" role="toolbar">
@@ -78,10 +89,11 @@
                             <div class="btn-group" role="group">
                                 <button type="button" id="banUser" data-toggle="tooltip" data-placement="top" title="Ban" class="btn btn-warning" {% if not user.active %}disabled{% endif %}><i class="fa fa-ban"></i></button>
                             </div>
-
+                            {% if auth.isHeadAdmin %}
                             <div class="btn-group" role="group">
                                 <button type="button" id="deleteUser" data-toggle="tooltip" data-placement="right" title="Delete" class="btn btn-danger"><i class="fa fa-trash"></i></button>
                             </div>
+                            {% endif %}
                         </div>
                         {% else %}
                             <span class="text-info">No additional actions can be made for this user.</span>
@@ -95,190 +107,327 @@
 {% endblock %}
 {% block scripts %}
 <script type="text/javascript">
-    $(function() {
-        $('#activateUser').tooltip();
-        $('#banUser').tooltip();
-        $('#deleteUser').tooltip();
-        // This could be so much more simpler.....
-        $("#deleteUser").on('click', function(e) {
-            e.preventDefault();
-            swal({
-                title: 'Are you sure?',
-                text: 'If you click yes, {{ user.username }}\'s account will be deleted!',
-                type: 'error',
-                showCancelButton: true,
-                confirmButtonColor: '#2196F3',
-                cancelButtonColor: '#F44336',
-                confirmButtonText: 'Yes, delete {{ user.username }}',
-                cancelButtonText: 'Nevermind',
-                closeOnConfirm: false,
-                closeOnCancel: false,
-                allowEscapeKey: false
-            }, function(isConfirm) {
-                if(isConfirm) {
-                    $.ajax({
-                        url: "{{ path_for('admin.users.delete', {id: user.id}) }}",
-                        type: "POST",
-                        dataType: "json",
-                        data: {
-                            "csrf_name": "{{ csrf_name }}",
-                            "csrf_value": "{{ csrf_token }}"
-                        }
-                    }).success(function(data) {
-                        swal({
-                            title: 'Deleted',
-                            text: data.message,
-                            type: 'success',
-                            timer: 5000
-                        }, function(isConfirm) {
-                            // Don't use this.
-                            redirectToUserList();
-                        });
-                    }).error(function(data) {
-                        var res = $.parseJSON(data.responseText);
-                        swal({
-                            title: res.status + " (" + res.error + ")",
-                            text: res.message,
-                            type: 'error',
-                            timer: 5000
-                        }, function(isConfirm) {
-                            reload(100);
-                        });
-                    });
-                } else {
-                    swal({
-                        title: 'Cancelled',
-                        text: '<b>{{ user.username }}</b>\'s account will not be banned',
-                        html: true,
-                        type: 'error',
-                        timer: 5000
-                    });
+$(function() {
+  $('[data-toggle="tooltip"]').tooltip();
+    // This could be so much more simpler.....
+    $("#demote").on('click', function(e) {
+      e.preventDefault();
+      swal({
+        title: 'Are you sure?',
+        text: 'If you click yes, {{ user.username }}\'s will no longer have admin access!',
+        type: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#2196F3',
+        cancelButtonColor: '#F44336',
+        confirmButtonText: 'Yes, demote {{ user.username }}',
+        cancelButtonText: 'Nevermind',
+        closeOnConfirm: true,
+        closeOnCancel: true
+      }, function(isConfirm) {
+        if(isConfirm) {
+            $.ajax({
+                url: "{{ path_for('admin.users.demote', {id: user.id, type: 'admin'}) }}",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "csrf_name": "{{ csrf_name }}",
+                    "csrf_value": "{{ csrf_token }}"
                 }
-            });
-        });
-        $("#banUser").on('click', function(e) {
-            e.preventDefault();
-
-            swal({
-                title: 'Are you sure?',
-                text: 'If you click yes, {{ user.username }}\'s account will be banned!',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#2196F3',
-                cancelButtonColor: '#F44336',
-                confirmButtonText: 'Yes, ban {{ user.username }}',
-                cancelButtonText: 'Nevermind',
-                closeOnConfirm: false,
-                closeOnCancel: false
-            }, function(isConfirm) {
-                if(isConfirm) {
-                    $.ajax({
-                        url: "{{ path_for('admin.users.ban', {id: user.id}) }}",
-                        type: "POST",
-                        dataType: "json",
-                        data: {
-                            "csrf_name": "{{ csrf_name }}",
-                            "csrf_value": "{{ csrf_token }}"
+            }).success(function(data) {
+                noty({
+                    layout: "topRight",
+                    theme: "relax",
+                    type: "success",
+                    text: "<strong>Demoted!</strong> " + data.message,
+                    timout: 2000,
+                    animation: {
+                        open: 'animated bounceInLeft',
+                        close: 'animated bounceOutRight'
+                    },
+                    callback: {
+                        afterClose: function() {
+                            reload(100);
+                        },
+                        onClickClose: function() {
+                            reload(100);
                         }
-                    }).success(function(data) {
-                        swal({
-                            title: 'Banned',
-                            text: data.message,
-                            type: 'success',
-                            timer: 5000
-                        }, function(isConfirm) {
+                    }
+                });
+                // Noty isn't using the timeout param correctly so we need to force refresh
+                reload(5000);
+            }).error(function(data) {
+                console.log(data);
+                var res = $.parseJSON(data.responseText);
+                noty({
+                    layout: "topRight",
+                    theme: "relax",
+                    type: "error",
+                    text: "<strong>Uh-oh!</strong> " + res.message,
+                    timout: 2000,
+                    animation: {
+                        open: 'animated bounceInLeft',
+                        close: 'animated bounceOutRight'
+                    },
+                    callback: {
+                        afterClose: function() {
                             reload(100);
-                        });
-                    }).error(function(data) {
-                        var res = $.parseJSON(data.responseText);
-                        swal({
-                            title: res.status + " (" + res.error + ")",
-                            text: res.message,
-                            type: 'error',
-                            timer: 5000
-                        }, function(isConfirm) {
+                        },
+                        onClickClose: function() {
                             reload(100);
-                        });
-                    });
-                } else {
-                    swal({
-                        title: 'Cancelled',
-                        text: '<b>{{ user.username }}</b>\'s account will not be banned',
-                        html: true,
-                        type: 'error',
-                        timer: 5000
-                    });
+                        }
+                    }
+                });
+
+                reload(5000);
+            });
+        }
+      });
+    });
+
+    $("#promote").on('click', function(e) {
+      e.preventDefault();
+      swal({
+        title: 'Are you sure?',
+        text: 'If you click yes, {{ user.username }}\'s will be given admin access!',
+        type: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#2196F3',
+        cancelButtonColor: '#F44336',
+        confirmButtonText: 'Yes, promote {{ user.username }}',
+        cancelButtonText: 'Nevermind',
+        closeOnConfirm: true,
+        closeOnCancel: true
+      }, function(isConfirm) {
+        if(isConfirm) {
+            $.ajax({
+                url: "{{ path_for('admin.users.promote', {id: user.id, type: 'admin'}) }}",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "csrf_name": "{{ csrf_name }}",
+                    "csrf_value": "{{ csrf_token }}"
                 }
-            });
-        });
-
-        $("#activateUser").on('click', function(e) {
-            e.preventDefault();
-
-            swal({
-                title: 'Are you sure?',
-                text: 'If you click yes, {{ user.username }}\'s account will be activated!',
-                type: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#2196F3',
-                cancelButtonColor: '#F44336',
-                confirmButtonText: 'Activate {{ user.username }}',
-                cancelButtonText: 'Nevermind',
-                closeOnConfirm: false,
-                closeOnCancel: false
-            }, function(isConfirm) {
-                if(isConfirm) {
-                    $.ajax({
-                        url: "{{ path_for('admin.users.activate', {id: user.id}) }}",
-                        type: "POST",
-                        dataType: "json",
-                        data: {
-                            "csrf_name": "{{ csrf_name }}",
-                            "csrf_value": "{{ csrf_token }}"
+            }).success(function(data) {
+                noty({
+                    layout: "topRight",
+                    theme: "relax",
+                    type: "success",
+                    text: "<strong>Promoted!</strong> " + data.message,
+                    timout: 2000,
+                    animation: {
+                        open: 'animated bounceInLeft',
+                        close: 'animated bounceOutRight'
+                    },
+                    callback: {
+                        afterClose: function() {
+                            reload(100);
+                        },
+                        onClickClose: function() {
+                            reload(100);
                         }
-                    }).success(function(data) {
-                        swal({
-                            title: 'Activated',
-                            text: data.message,
-                            type: 'success',
-                            timer: 5000
-                        }, function(isConfirm) {
+                    }
+                });
+                // Noty isn't using the timeout param correctly so we need to force refresh
+                reload(5000);
+            }).error(function(data) {
+                console.log(data);
+                var res = $.parseJSON(data.responseText);
+                noty({
+                    layout: "topRight",
+                    theme: "relax",
+                    type: "error",
+                    text: "<strong>Uh-oh!</strong> " + res.message,
+                    timout: 2000,
+                    animation: {
+                        open: 'animated bounceInLeft',
+                        close: 'animated bounceOutRight'
+                    },
+                    callback: {
+                        afterClose: function() {
                             reload(100);
-                        });
-                    }).error(function(data) {
-                        var res = $.parseJSON(data.responseText);
-                        swal({
-                            title: res.status + " (" + res.error + ")",
-                            text: res.message,
-                            type: 'error',
-                            timer: 5000
-                        }, function(isConfirm) {
+                        },
+                        onClickClose: function() {
                             reload(100);
-                        });
-                    });
+                        }
+                    }
+                });
 
-                } else {
+                reload(5000);
+            });
+        }
+      });
+    });
+
+    $("#deleteUser").on('click', function(e) {
+        e.preventDefault();
+        swal({
+            title: 'Are you sure?',
+            text: 'If you click yes, {{ user.username }}\'s account will be deleted!',
+            type: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#2196F3',
+            cancelButtonColor: '#F44336',
+            confirmButtonText: 'Yes, delete {{ user.username }}',
+            cancelButtonText: 'Nevermind',
+            closeOnConfirm: false,
+            closeOnCancel: false,
+            allowEscapeKey: false
+        }, function(isConfirm) {
+            if(isConfirm) {
+                $.ajax({
+                    url: "{{ path_for('admin.users.delete', {id: user.id}) }}",
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        "csrf_name": "{{ csrf_name }}",
+                        "csrf_value": "{{ csrf_token }}"
+                    }
+                }).success(function(data) {
                     swal({
-                        title: 'Cancelled',
-                        text: '<b>{{ user.username }}</b>\'s account will not be activated',
-                        html: true,
+                        title: 'Deleted',
+                        text: data.message,
+                        type: 'success',
+                        timer: 5000
+                    }, function(isConfirm) {
+                        // Don't use this.
+                        redirectToUserList();
+                    });
+                }).error(function(data) {
+                    var res = $.parseJSON(data.responseText);
+                    swal({
+                        title: res.status + " (" + res.error + ")",
+                        text: res.message,
                         type: 'error',
                         timer: 5000
                     }, function(isConfirm) {
+                        reload(100);
                     });
-                }
-            });
+                });
+            } else {
+                swal({
+                    title: 'Cancelled',
+                    text: '<b>{{ user.username }}</b>\'s account will not be banned',
+                    html: true,
+                    type: 'error',
+                    timer: 5000
+                });
+            }
+        });
+    });
+    $("#banUser").on('click', function(e) {
+        e.preventDefault();
+
+        swal({
+            title: 'Are you sure?',
+            text: 'If you click yes, {{ user.username }}\'s account will be banned!',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#2196F3',
+            cancelButtonColor: '#F44336',
+            confirmButtonText: 'Yes, ban {{ user.username }}',
+            cancelButtonText: 'Nevermind',
+            closeOnConfirm: false,
+            closeOnCancel: false
+        }, function(isConfirm) {
+            if(isConfirm) {
+                $.ajax({
+                    url: "{{ path_for('admin.users.ban', {id: user.id}) }}",
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        "csrf_name": "{{ csrf_name }}",
+                        "csrf_value": "{{ csrf_token }}"
+                    }
+                }).success(function(data) {
+                    swal({
+                        title: 'Banned',
+                        text: data.message,
+                        type: 'success',
+                        timer: 5000
+                    }, function(isConfirm) {
+                        reload(100);
+                    });
+                }).error(function(data) {
+                    var res = $.parseJSON(data.responseText);
+                    swal({
+                        title: res.status + " (" + res.error + ")",
+                        text: res.message,
+                        type: 'error',
+                        timer: 5000
+                    }, function(isConfirm) {
+                        reload(100);
+                    });
+                });
+            } else {
+                swal({
+                    title: 'Cancelled',
+                    text: '<b>{{ user.username }}</b>\'s account will not be banned',
+                    html: true,
+                    type: 'error',
+                    timer: 5000
+                });
+            }
         });
     });
 
-    function reload(time) {
-        setTimeout(function() {
-            window.location.reload();
-        }, time);
-    }
-    // Don't use this.
-    function redirectToUserList() {
-        window.location = "http://127.0.0.1/demoapp/public/admin/users";
-    }
+    $("#activateUser").on('click', function(e) {
+        e.preventDefault();
+
+        swal({
+            title: 'Are you sure?',
+            text: 'If you click yes, {{ user.username }}\'s account will be activated!',
+            type: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#2196F3',
+            cancelButtonColor: '#F44336',
+            confirmButtonText: 'Activate {{ user.username }}',
+            cancelButtonText: 'Nevermind',
+            closeOnConfirm: false,
+            closeOnCancel: false
+        }, function(isConfirm) {
+            if(isConfirm) {
+                $.ajax({
+                    url: "{{ path_for('admin.users.activate', {id: user.id}) }}",
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        "csrf_name": "{{ csrf_name }}",
+                        "csrf_value": "{{ csrf_token }}"
+                    }
+                }).success(function(data) {
+                    swal({
+                        title: 'Activated',
+                        text: data.message,
+                        type: 'success',
+                        timer: 5000
+                    }, function(isConfirm) {
+                        reload(100);
+                    });
+                }).error(function(data) {
+                    var res = $.parseJSON(data.responseText);
+                    swal({
+                        title: res.status + " (" + res.error + ")",
+                        text: res.message,
+                        type: 'error',
+                        timer: 5000
+                    }, function(isConfirm) {
+                        reload(100);
+                    });
+                });
+
+            } else {
+                swal({
+                    title: 'Cancelled',
+                    text: '<b>{{ user.username }}</b>\'s account will not be activated',
+                    html: true,
+                    type: 'error',
+                    timer: 5000
+                }, function(isConfirm) {
+                });
+            }
+        });
+    });
+});
+
 </script>
 {% endblock %}

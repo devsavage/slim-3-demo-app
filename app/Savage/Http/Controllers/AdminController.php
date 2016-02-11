@@ -174,4 +174,96 @@ class AdminController extends Controller
             return $this->response->withStatus(200)->withHeader('Content-type', 'application/json')->write(json_encode($data));
         }
     }
+
+    public function postUserPromote() {
+        $id = $this->request->getAttribute('id');
+        $type = $this->request->getAttribute('type');
+        $user = $this->container->user->where('id', $id)->first();
+
+        if(!$user) {
+            $data = [
+                'status' => 404,
+                'error' => "Not Found",
+                'message' => "User with id {$id} does not exist."
+            ];
+
+            return $this->response->withStatus(404)->withHeader('Content-type', 'application/json')->write(json_encode($data));
+        } else {
+            switch($type) {
+                case "admin":
+                    if(!$user->isAdmin()) {
+                        $user->promoteAdmin();
+
+                        $data = [
+                            'status' => 200,
+                            'message' => "{$user->username} is now an administrator"
+                        ];
+
+                        return $this->response->withStatus($data['status'])->withHeader('Content-type', 'application/json')->write(json_encode($data));
+                    } else {
+                        $data = [
+                            'status' => 422,
+                            'message' => "{$user->username} is already an administrator"
+                        ];
+
+                        return $this->response->withStatus($data['status'])->withHeader('Content-type', 'application/json')->write(json_encode($data));
+                    }
+                    break;
+                default:
+                    $data = [
+                        'status' => 400,
+                        'message' => "Promotion type was not given."
+                    ];
+
+                    return $this->response->withStatus($data['status'])->withHeader('Content-type', 'application/json')->write(json_encode($data));
+                    break;
+            }
+        }
+    }
+
+    public function postUserDemote() {
+        $id = $this->request->getAttribute('id');
+        $type = $this->request->getAttribute('type');
+        $user = $this->container->user->where('id', $id)->first();
+
+        if(!$user) {
+            $data = [
+                'status' => 404,
+                'error' => "Not Found",
+                'message' => "User with id {$id} does not exist."
+            ];
+
+            return $this->response->withStatus(404)->withHeader('Content-type', 'application/json')->write(json_encode($data));
+        } else {
+            switch($type) {
+                case "admin":
+                    if(!$user->isAdmin()) {
+                        $user->demoteAdmin();
+
+                        $data = [
+                            'status' => 200,
+                            'message' => "{$user->username} is no longer an administrator"
+                        ];
+
+                        return $this->response->withStatus($data['status'])->withHeader('Content-type', 'application/json')->write(json_encode($data));
+                    } else {
+                        $data = [
+                            'status' => 422,
+                            'message' => "{$user->username} is not an administrator"
+                        ];
+
+                        return $this->response->withStatus($data['status'])->withHeader('Content-type', 'application/json')->write(json_encode($data));
+                    }
+                    break;
+                default:
+                    $data = [
+                        'status' => 400,
+                        'message' => "Promotion type was not given."
+                    ];
+
+                    return $this->response->withStatus($data['status'])->withHeader('Content-type', 'application/json')->write(json_encode($data));
+                    break;
+            }
+        }
+    }
 }

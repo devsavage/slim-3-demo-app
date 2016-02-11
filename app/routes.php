@@ -36,5 +36,8 @@ $site->group('/admin', function() {
 
     $this->authRoute(['POST'], '/users/edit/{id}/ban', \Savage\Http\Controllers\AdminController::class, 'userBan')->add(new \Savage\Http\Filters\AdminFilter($this))->setName('admin.users.ban');
 
-    $this->authRoute(['POST'], '/users/edit/{id}/delete', \Savage\Http\Controllers\AdminController::class, 'userDelete')->add(new \Savage\Http\Filters\AdminFilter($this))->setName('admin.users.delete');
+    $this->authRoute(['POST'], '/users/edit/{id}/delete', \Savage\Http\Controllers\AdminController::class, 'userDelete')->add(new \Savage\Http\Filters\HeadAdminFilter($this, true))->setName('admin.users.delete');
+
+    $this->authRoute(['POST'], '/users/edit/{id}/promote/{type}', \Savage\Http\Controllers\AdminController::class, 'userPromote')->add(new \Savage\Http\Filters\HeadAdminFilter($this, true))->setName('admin.users.promote');
+    $this->authRoute(['POST'], '/users/edit/{id}/demote/{type}', \Savage\Http\Controllers\AdminController::class, 'userDemote')->add(new \Savage\Http\Filters\HeadAdminFilter($this, true))->setName('admin.users.demote');
 });
