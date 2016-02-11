@@ -237,7 +237,7 @@ class AdminController extends Controller
         } else {
             switch($type) {
                 case "admin":
-                    if(!$user->isAdmin()) {
+                    if($user->isAdmin()) {
                         $user->demoteAdmin();
 
                         $data = [

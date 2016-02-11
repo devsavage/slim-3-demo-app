@@ -23,7 +23,8 @@ class User extends Eloquent
     }
 
     public function isAdmin() {
-        return $this->hasPermission('is_admin');
+        // We want to check if a user may be a head admin so they can do things like normal admins can.
+        return $this->hasPermission('is_admin') || $this->hasPermission('is_head_admin');
     }
 
     public function promoteAdmin() {

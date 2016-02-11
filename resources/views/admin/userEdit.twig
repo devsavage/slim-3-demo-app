@@ -139,7 +139,8 @@ $(function() {
                     theme: "relax",
                     type: "success",
                     text: "<strong>Demoted!</strong> " + data.message,
-                    timout: 2000,
+                    timeout: 2000,
+                    buttons: false,
                     animation: {
                         open: 'animated bounceInLeft',
                         close: 'animated bounceOutRight'
@@ -153,17 +154,16 @@ $(function() {
                         }
                     }
                 });
-                // Noty isn't using the timeout param correctly so we need to force refresh
-                reload(5000);
             }).error(function(data) {
                 console.log(data);
                 var res = $.parseJSON(data.responseText);
                 noty({
                     layout: "topRight",
                     theme: "relax",
-                    type: "error",
+                    type: "warning",
                     text: "<strong>Uh-oh!</strong> " + res.message,
-                    timout: 2000,
+                    timeout: 2000,
+                    buttons: false,
                     animation: {
                         open: 'animated bounceInLeft',
                         close: 'animated bounceOutRight'
@@ -177,10 +177,8 @@ $(function() {
                         }
                     }
                 });
-
-                reload(5000);
             });
-        }
+          }
       });
     });
 
@@ -213,7 +211,8 @@ $(function() {
                     theme: "relax",
                     type: "success",
                     text: "<strong>Promoted!</strong> " + data.message,
-                    timout: 2000,
+                    timeout: 2000,
+                    buttons: false,
                     animation: {
                         open: 'animated bounceInLeft',
                         close: 'animated bounceOutRight'
@@ -227,8 +226,6 @@ $(function() {
                         }
                     }
                 });
-                // Noty isn't using the timeout param correctly so we need to force refresh
-                reload(5000);
             }).error(function(data) {
                 console.log(data);
                 var res = $.parseJSON(data.responseText);
@@ -237,7 +234,8 @@ $(function() {
                     theme: "relax",
                     type: "error",
                     text: "<strong>Uh-oh!</strong> " + res.message,
-                    timout: 2000,
+                    timeout: 2000,
+                    buttons: false,
                     animation: {
                         open: 'animated bounceInLeft',
                         close: 'animated bounceOutRight'
@@ -251,8 +249,6 @@ $(function() {
                         }
                     }
                 });
-
-                reload(5000);
             });
         }
       });
@@ -309,11 +305,12 @@ $(function() {
                     text: '<b>{{ user.username }}</b>\'s account will not be banned',
                     html: true,
                     type: 'error',
-                    timer: 5000
+                    timer: 3000
                 });
             }
         });
     });
+
     $("#banUser").on('click', function(e) {
         e.preventDefault();
 
@@ -326,8 +323,8 @@ $(function() {
             cancelButtonColor: '#F44336',
             confirmButtonText: 'Yes, ban {{ user.username }}',
             cancelButtonText: 'Nevermind',
-            closeOnConfirm: false,
-            closeOnCancel: false
+            closeOnConfirm: true,
+            closeOnCancel: true
         }, function(isConfirm) {
             if(isConfirm) {
                 $.ajax({
@@ -339,13 +336,25 @@ $(function() {
                         "csrf_value": "{{ csrf_token }}"
                     }
                 }).success(function(data) {
-                    swal({
-                        title: 'Banned',
-                        text: data.message,
-                        type: 'success',
-                        timer: 5000
-                    }, function(isConfirm) {
-                        reload(100);
+                    noty({
+                        layout: "topRight",
+                        theme: "relax",
+                        type: "success",
+                        text: "<strong>Banned!</strong> " + data.message,
+                        timeout: 2000,
+                        buttons: false,
+                        animation: {
+                            open: 'animated bounceInLeft',
+                            close: 'animated bounceOutRight'
+                        },
+                        callback: {
+                            afterClose: function() {
+                                reload(100);
+                            },
+                            onClickClose: function() {
+                                reload(100);
+                            }
+                        }
                     });
                 }).error(function(data) {
                     var res = $.parseJSON(data.responseText);
@@ -382,8 +391,8 @@ $(function() {
             cancelButtonColor: '#F44336',
             confirmButtonText: 'Activate {{ user.username }}',
             cancelButtonText: 'Nevermind',
-            closeOnConfirm: false,
-            closeOnCancel: false
+            closeOnConfirm: true,
+            closeOnCancel: true
         }, function(isConfirm) {
             if(isConfirm) {
                 $.ajax({
@@ -395,13 +404,25 @@ $(function() {
                         "csrf_value": "{{ csrf_token }}"
                     }
                 }).success(function(data) {
-                    swal({
-                        title: 'Activated',
-                        text: data.message,
-                        type: 'success',
-                        timer: 5000
-                    }, function(isConfirm) {
-                        reload(100);
+                    noty({
+                        layout: "topRight",
+                        theme: "relax",
+                        type: "success",
+                        text: "<strong>Activated!</strong> " + data.message,
+                        timeout: 2000,
+                        buttons: false,
+                        animation: {
+                            open: 'animated bounceInLeft',
+                            close: 'animated bounceOutRight'
+                        },
+                        callback: {
+                            afterClose: function() {
+                                reload(100);
+                            },
+                            onClickClose: function() {
+                                reload(100);
+                            }
+                        }
                     });
                 }).error(function(data) {
                     var res = $.parseJSON(data.responseText);

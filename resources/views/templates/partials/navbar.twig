@@ -18,7 +18,7 @@
             <li><a href="{{ path_for('auth.login') }}">Login</a></li>
             <li><a href="{{ path_for('auth.register') }}">Register</a></li>
         {% else %}
-            <p class="navbar-text">Signed in as {{ auth.username }}</p>
+            <p class="navbar-text">Signed in as {% if auth.isAdmin %}<span class="text-danger">{{ auth.username }}</span>{% else %}{{ auth.username }}{% endif %}</p>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account <span class="caret"></span></a>
                 <ul class="dropdown-menu">
