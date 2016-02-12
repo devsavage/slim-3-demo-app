@@ -14,9 +14,9 @@ class ApiController extends Controller
     }
 
     public function getNotifications() {
-        if(!$this->container->site->auth) return $this->response(['status' => 401, 'message' => 'Not authorized']);
-
         $user = $this->container->site->auth;
+
+        if(!$user) return $this->response(['status' => 401, 'message' => 'Not authorized']);
 
         $data = [
             'status' => 200,
