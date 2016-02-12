@@ -24,6 +24,8 @@ $site->group('/auth', function() {
     $this->authRoute(['GET', 'POST'], '/settings/update/profile', \Savage\Http\Controllers\AuthController::class, 'profile')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.update.profile');
 
     $this->authRoute(['GET', 'POST'], '/settings/update/password', \Savage\Http\Controllers\AuthController::class, 'password')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.update.password');
+
+    $this->authRoute(['GET'], '/notifications', \Savage\Http\Controllers\AuthController::class, 'notifications')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.notifications');
 });
 
 $site->group('/admin', function() {

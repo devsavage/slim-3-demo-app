@@ -219,4 +219,12 @@ class AuthController extends Controller {
             }
         }
     }
+
+    /**
+     * Notifications
+     */
+
+     public function getNotifications() {
+        return $this->render('auth/notifications');
+     }
 }

@@ -24,6 +24,13 @@ class User extends Eloquent
         return $this->hasMany('Savage\Http\Auth\User\UserNotifications', 'user_id');
     }
 
+    public function notify($message, $urgent = false) {
+        return $this->notifications()->create([
+            'message' => $message,
+            'urgent' => $urgent,
+        ]);
+    }
+
     public function hasPermission($permission) {
         return (bool)$this->permissions->{$permission};
     }
