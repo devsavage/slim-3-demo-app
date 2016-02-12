@@ -46,5 +46,5 @@ $site->group('/admin', function() {
 });
 
 $site->group('/api', function() {
-    $this->authRoute(['GET'], '/notifications', Savage\Http\Controllers\ApiController::class, 'notifications')->setName('api.notifications');
+    $this->authRoute(['GET', 'POST'], '/notifications', Savage\Http\Controllers\ApiController::class, 'notifications')->setName('api.notifications');
 });

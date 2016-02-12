@@ -76,9 +76,8 @@
             });
         });
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.16/vue.min.js"></script>
     <script type="text/javascript">
-        var g = new Vue({
+        new Vue({
             el: "#notification-container",
             data: {
                 newNotifications: [],
@@ -101,8 +100,62 @@
                     }.bind(this));
                 },
                 markAsRead: function(id) {
-                    // Post to notification API to mark the post as read...
-                    console.log("Mark", id, "as read.");
+                    $.ajax({
+                        url: "http://127.0.0.1/demoapp/public/api/notifications",
+                        data: {
+                            "csrf_name": "{{ csrf_name }}",
+                            "csrf_value": "{{ csrf_token }}",
+                            "id": id
+                        },
+                        dataType: "json",
+                        type: "POST"
+                    }).success(function(data) {
+                        console.log(data);
+                        noty({
+                            layout: "topRight",
+                            theme: "relax",
+                            type: "success",
+                            text: data.message,
+                            timeout: 5000,
+                            buttons: false,
+                            animation: {
+                                open: 'animated bounceInLeft',
+                                close: 'animated bounceOutRight'
+                            },
+                            callback: {
+                                afterClose: function() {
+                                    reload(100);
+                                },
+                                onClickClose: function() {
+                                    reload(100);
+                                }
+                            }
+                        });
+
+                        this.getNotifications();
+                    }.bind(this)).error(function(data) {
+                        console.log(data);
+                        noty({
+                            layout: "topRight",
+                            theme: "relax",
+                            type: "error",
+                            text: data.message,
+                            timeout: 5000,
+                            buttons: false,
+                            animation: {
+                                open: 'animated bounceInLeft',
+                                close: 'animated bounceOutRight'
+                            },
+                            callback: {
+                                afterClose: function() {
+                                    reload(100);
+                                },
+                                onClickClose: function() {
+                                    reload(100);
+                                }
+                            }
+                        });
+                    });
                 }
             },
             ready: function() {

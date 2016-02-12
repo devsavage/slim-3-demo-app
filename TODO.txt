@@ -1,1 +1,1 @@
--- Add relations between all tables that connect with a user_id so when we add the ability to delete a user, it will delete all data connected with it.
+-- Fix notifications page so we won't need to reload after viewing a notification, we can achieve this by creating a middleware to bypass the CSRF protection (extending the Guard class and overriding the __invoke method).
