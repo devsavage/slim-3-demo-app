@@ -24,7 +24,7 @@ class ApiController extends Controller
             'user' => $this->container->site->auth,
             'notifications' => [
                 'unread' => $notifications->where('viewed', false)->get(),
-                'read' => $notifications->where('viewed', false)->get(),
+                'read' => $notifications->where('viewed', true)->get(),
             ],
             'total' => $notifications->get()->count(),
             'unread' => $notifications->where('viewed', false)->count(),
