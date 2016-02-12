@@ -16,18 +16,18 @@ class ApiController extends Controller
     public function getNotifications() {
         if(!$this->container->site->auth) return $this->response(['status' => 401, 'message' => 'Not authorized']);
 
-        $notifications = $this->container->site->auth->notifications()->orderBy('urgent', 'DESC')->orderBy('created_at', 'DESC');
+        $user = $this->container->site->auth;
 
         $data = [
             'status' => 200,
             'endpoint' => $this->getEndpoint(),
-            'user' => $this->container->site->auth,
+            'user' => $user,
             'notifications' => [
-                'unread' => $notifications->where('viewed', false)->get(),
-                'read' => $notifications->where('viewed', true)->get(),
+                'new' => $user->notifications()->where('viewed', false)->orderBy('urgent', 'DESC')->orderBy('created_at', 'DESC')->get(),
+                'old' => $user->notifications()->where('viewed', true)->orderBy('created_at', 'DESC')->get(),
             ],
-            'total' => $notifications->get()->count(),
-            'unread' => $notifications->where('viewed', false)->count(),
+            'total' => $user->notifications()->count(),
+            'unread' => $user->notifications()->where('viewed', '=', '0')->count(),
         ];
 
         return $this->response($data);

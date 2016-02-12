@@ -1,7 +1,7 @@
 {% extends 'templates/layout.twig' %}
 
 {% block content %}
-<div class="container">
+<div class="container" id="notification-container">
     <div class="col-lg-12">
         <div class="page-header">
             <h1>Notifications</h1>
@@ -10,7 +10,11 @@
             <div class="col-md-4">
                 <div class="well">
                     <ul class="nav nav-pills nav-stacked" role="tablist">
-                        <li role="presentation" class="active"><a href="#new" aria-controls="new" role="tab" data-toggle="tab">Unread</a></li>
+                        <li role="presentation" class="active">
+                            <a href="#new" aria-controls="new" role="tab" data-toggle="tab">Unread
+                                <span v-if="unread > 0" class="badge">{% raw %}{{ unread }}{% endraw %}</span></a>
+
+                        </li>
                         <li role="presentation"><a href="#old" aria-controls="old" role="tab" data-toggle="tab">Read</a></li>
                     </ul>
                 </div>
@@ -21,7 +25,7 @@
                         <p>
                             <h2>New Notifications</h2>
                             <hr>
-                            <div id="notification-container">
+                            <div>
                                 <p v-if="!newNotifications.length">
                                     <i>No new notifications...</i>
                                 </p>
@@ -90,8 +94,8 @@
                         type: "GET"
                     }).success(function (data) {
                         console.log(data);
-                      this.newNotifications = data.notifications.unread;
-                      this.oldNotifications = data.notifications.read;
+                      this.newNotifications = data.notifications.new;
+                      this.oldNotifications = data.notifications.old;
                       this.total = data.total;
                       this.unread = data.unread;
                     }.bind(this));
