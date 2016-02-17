@@ -26,6 +26,13 @@ $site->group('/auth', function() {
     $this->authRoute(['GET', 'POST'], '/settings/update/password', \Savage\Http\Controllers\AuthController::class, 'password')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.update.password');
 
     $this->authRoute(['GET'], '/notifications', \Savage\Http\Controllers\AuthController::class, 'notifications')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.notifications');
+
+    $this->authRoute(['GET'], '/messages', \Savage\Http\Controllers\AuthController::class, 'directMessages')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages');
+
+    $this->authRoute(['GET', 'POST'], '/messages/view/{id}', Savage\Http\Controllers\AuthController::class, 'viewDirectMessage')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages.view');
+
+    $this->authRoute(['POST'], '/messages/compose', Savage\Http\Controllers\AuthController::class, 'composeMessage')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages.compose');
+
 });
 
 $site->group('/admin', function() {
@@ -47,4 +54,5 @@ $site->group('/admin', function() {
 
 $site->group('/api', function() {
     $this->authRoute(['GET', 'POST'], '/notifications', Savage\Http\Controllers\ApiController::class, 'notifications')->setName('api.notifications');
+    $this->authRoute(['GET'], '/messages', Savage\Http\Controllers\ApiController::class, 'directMessages')->setName('api.messages');
 });

@@ -53,6 +53,10 @@ return [
       return new \Savage\Http\Auth\User;
     },
 
+    'directMessage' => function() {
+      return new \Savage\Http\Auth\User\UserDirectMessages;
+    },
+
     'util' => function() {
       return new \Savage\Http\Util\Utils;
     },
@@ -66,7 +70,9 @@ return [
     },
 
     'view' => function($c) {
-      $view = new \Slim\Views\Twig($c['settings']['viewTemplatesDirectory']);
+      $view = new \Slim\Views\Twig($c['settings']['viewTemplatesDirectory'], [
+          'debug' => true,
+      ]);
 
       $view->addExtension(new \Slim\Views\TwigExtension(
         $c['router'],
@@ -74,6 +80,7 @@ return [
       ));
 
       $view->addExtension(new \Savage\Extension\TwigExtension);
+      $view->addExtension(new \Twig_Extension_Debug());
 
       $view->getEnvironment()->addGlobal('flash', $c['flash']);
 

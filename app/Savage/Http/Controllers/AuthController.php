@@ -227,4 +227,93 @@ class AuthController extends Controller {
      public function getNotifications() {
         return $this->render('auth/notifications');
      }
+
+     /**
+      * Direct Messages
+      */
+
+      public function getDirectMessages() {
+         return $this->render('auth/messages', [
+             'messages' => $this->container->site->auth->getDirectMessages(),
+         ]);
+      }
+
+      public function getViewDirectMessage() {
+          $messageId = $this->request->getAttribute('id');
+
+          $rawMessage = $this->container->directMessage->where('id', $messageId)->first();
+
+          // Check to see if the message exists and if it does, is the user able to view it.
+          if(!$rawMessage || $rawMessage && $rawMessage->receiver_id !== $this->container->site->auth->id) {
+              return $this->redirectTo('auth.messages');
+          }
+
+          $message = $this->container->directMessage->where('direct_messages.id', $messageId)
+            ->join('users', 'direct_messages.sender_id', '=', 'users.id')
+            ->select('direct_messages.*', 'users.username as sender_username', 'users.first_name as sender_first_name', 'users.last_name as sender_last_name')
+            ->first();
+
+          $message->update([
+              'viewed' => true, 
+          ]);
+
+          return $this->render('auth/viewMessage', [
+              'message' => $message,
+          ]);
+      }
+
+
+      public function postComposeMessage() {
+          if($this->data() === null) {
+              $this->flashNow('error', 'Please fill out the fields!');
+              return $this->redirectTo('auth.messages');
+          } else {
+              $validator = $this->getValidator();
+
+              $data = [
+                  'message_recipient' => $this->data()->message_recipient,
+                  'message_subject' => $this->data()->message_subject,
+                  'message_body' => $this->data()->message_body,
+              ];
+
+              $validator->validate([
+                  'message_recipient|Recipient' => [$data['message_recipient'], 'required|validUsername|notAuthUsername'],
+                  'message_subject|Subject' => [$data['message_subject'], 'required'],
+                  'message_body|Message' => [$data['message_body'], 'required'],
+              ]);
+
+              if($validator->passes()) {
+                  $userTo = $this->container->user->where('username', $this->data()->message_recipient)->first();
+
+                  if($userTo) {
+                      $this->container->directMessage->sendMessage(
+                      $userTo->id,
+                      $this->container->site->auth->id,
+                      $this->data()->message_subject,
+                      $this->data()->message_body);
+
+                      $this->flash('notySuccess', 'Your message has been sent!');
+                      return $this->redirectTo('auth.messages');
+                  } else {
+                      // We should never reach this point... so I won't add all the posted data here.
+                      $this->flash('error', 'We could not find the user you selected.');
+                      return $this->redirectTo('auth.messages');
+                  }
+              } else {
+                  $this->flash('error', 'There were some errors while trying to send your message, please fix them and try again.');
+
+                  // These are the posted values
+                  $this->flash('recipient', $this->data()->message_recipient);
+                  $this->flash('subject', $this->data()->message_subject);
+                  $this->flash('body', $this->data()->message_body);
+
+                  // These are the errors
+                  $this->flash('message_recipient_error', $validator->errors()->first('message_recipient'));
+                  $this->flash('message_subject_error', $validator->errors()->first('message_subject'));
+                  $this->flash('message_body_error', $validator->errors()->first('message_body'));
+
+                  return $this->redirectTo('auth.messages');
+              }
+          }
+      }
 }

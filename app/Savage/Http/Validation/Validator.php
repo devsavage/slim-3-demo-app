@@ -28,11 +28,25 @@ class Validator extends Violin
 
             'confirm_new_password' => [
                 'matches' => 'Confirm New Password must match New Password.',
-            ]
+            ],
+
+            'message-recipient' => [
+                'required' => 'Recipient is required.'
+            ],
+
+            'message-subject' => [
+                'required' => 'Message subject is required.'
+            ],
+
+            'message-body' => [
+                'required' => 'Message body is required.'
+            ],
         ]);
 
         $this->addRuleMessages([
             'matchesCurrentPassword' => 'Your current password is incorrect.',
+            'validUsername' => 'The username you entered was not found.',
+            'notAuthUsername' => 'Please enter a valid username.',
         ]);
     }
 
@@ -51,6 +65,22 @@ class Validator extends Violin
 
     public function validate_matchesCurrentPassword($value, $input, $args) {
         if($this->auth && $this->utils->verifyPassword($value, $this->auth->password)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function validate_validUsername($value, $input, $args) {
+        if($this->user->where('username', $value)->first()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function validate_notAuthUsername($value, $input, $args) {
+        if($this->auth && $this->auth->username !== $value) {
             return true;
         }
 

@@ -1,0 +1,77 @@
+{% extends 'templates/layout.twig' %}
+
+{% block styles %}
+<style media="screen">
+.nav-pills>li>a {padding: 5px 10px;}
+.nav-pills {padding-bottom: 10px;}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="col-lg-12">
+        <div class="page-header">
+            <h1>Direct Messages</h1>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb">
+                  <li><a href="{{ path_for('auth.messages') }}">Inbox</a></li>
+                  <li class="active">{{ message.subject }}</li>
+                </ol>
+            </div>
+            <div class="col-sm-3 col-md-2">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><a href="{{ path_for('auth.messages') }}"><span class="badge pull-right">42</span> Inbox </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-sm-9 col-md-10">
+                <div class="well well-sm">
+                    <h3>{{ message.sender_first_name }} {{ message.sender_last_name }} <span class="text-muted">({{ message.sender_username }})</span></h3>
+                    <hr>
+                    <p>
+                        <div class="messsage">
+                            {{ message.body }}
+                        </div>
+                    </p>
+                </div>
+                <div class="reply">
+                    <form class="" action="index.html" method="post">
+                        <div class="form-group">
+                            <textarea name="name" rows="3" class="form-control" placeholder="Reply to this message..."></textarea>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="pull-right">
+                                <button type="button" name="button" class="btn btn-primary" id="reply">Reply</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+    $(function() {
+        $("#reply").click(function() {
+            noty({
+                layout: "topRight",
+                theme: "relax",
+                type: "information",
+                text: "<strong>Soon!</strong> You can't reply to this message at this time.",
+                timeout: 5000,
+                buttons: false,
+                animation: {
+                    open: 'animated bounceInLeft',
+                    close: 'animated bounceOutRight'
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

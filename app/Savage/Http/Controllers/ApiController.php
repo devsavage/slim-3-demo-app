@@ -20,7 +20,6 @@ class ApiController extends Controller
 
         $data = [
             'status' => 200,
-            'endpoint' => $this->getEndpoint(),
             'user' => $user,
             'notifications' => [
                 'new' => $user->notifications()->where('viewed', false)->orderBy('urgent', 'DESC')->orderBy('created_at', 'DESC')->get(),
@@ -71,9 +70,31 @@ class ApiController extends Controller
         }
     }
 
+    public function getDirectMessages() {
+        $user = $this->container->site->auth;
+
+        if(!$user) return $this->response(['status' => 401, 'message' => 'Not authorized']);
+
+        $data = [
+            'status' => 200,
+            'user' => $user,
+            'direct_messages' => $user->directMessages()
+                ->join('users', 'direct_messages.sender_id', '=', 'users.id')
+                ->select('direct_messages.*', 'users.username as sender_username', 'users.first_name as sender_first_name', 'users.last_name as sender_last_name')
+                ->orderBy('direct_messages.created_at', 'DESC')
+                ->get(),
+            'total' => $user->directMessages()->count(),
+        ];
+
+        return $this->response($data);
+    }
+
     private function response($data = []) {
         if(empty($data) || !isset($data['status'])) return;
-        return $this->response->withHeader('Content-type', 'application/json')->withStatus($data['status'])->write(json_encode($data));
+
+        $appendData = ['endpoint' => $this->getEndpoint()];
+
+        return $this->response->withHeader('Content-type', 'application/json')->withStatus($data['status'])->write(json_encode(array_merge($appendData, $data)));
     }
 
     private function getEndpoint() {

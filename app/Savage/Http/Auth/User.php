@@ -24,6 +24,10 @@ class User extends Eloquent
         return $this->hasMany('Savage\Http\Auth\User\UserNotifications', 'user_id');
     }
 
+    public function directMessages() {
+        return $this->hasMany('Savage\Http\Auth\User\UserDirectMessages', 'receiver_id');
+    }
+
     public function notify($message, $urgent = false) {
         return $this->notifications()->create([
             'message' => $message,
@@ -68,5 +72,13 @@ class User extends Eloquent
 
     public function removeRememberCredentials() {
         $this->updateRememberCredentials(null, null);
+    }
+
+    public function getDirectMessages() {
+        return $this->directMessages()
+            ->join('users', 'direct_messages.sender_id', '=', 'users.id')
+            ->select('direct_messages.*', 'users.username as sender_username', 'users.first_name as sender_first_name', 'users.last_name as sender_last_name')
+            ->orderBy('direct_messages.created_at', 'DESC')
+            ->get();
     }
 }
