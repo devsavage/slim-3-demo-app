@@ -1,5 +1,6 @@
 # Slim 3 Demo App
 Well, basically this project is a basic Slim 3 application with authentication.   
+You can view a live version of this project at [https://slim-3-demo-app-savageboy74.c9users.io/public/](https://slim-3-demo-app-savageboy74.c9users.io/public/)  
 I am using Eloquent ORM for the database implementation. You can read more about Eloquent ORM [here](https://laravel.com/docs/master/eloquent).  
 I will continue to add more features as I see fit, soon.
 
