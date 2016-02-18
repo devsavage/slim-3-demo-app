@@ -1,5 +1,3 @@
 -- Fix notifications page so we won't need to reload after viewing a notification, we can achieve this by creating a middleware to bypass the CSRF protection (extending the Guard class and overriding the __invoke method).
 
--- Fix up the Direct Message delete system so we can select multiple and delete them at once..
-
 -- Show users in a dropdown with Twitter's typeahead.js in the compose message modal
