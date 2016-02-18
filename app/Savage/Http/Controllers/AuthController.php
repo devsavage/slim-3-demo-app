@@ -232,12 +232,15 @@ class AuthController extends Controller {
       * Direct Messages
       */
 
-      public function getDirectMessages() {
-         return $this->render('auth/messages', [
-             'messages' => $this->container->site->auth->getDirectMessages(),
-             'deleted_messages' => $this->container->site->auth->getDirectMessages(true),
-         ]);
-      }
+        public function getDirectMessages() {
+
+            $uMessagesForCount = $this->container->directMessage->where('receiver_id', $this->container->site->auth->id)->where('viewed', false)->where('deleted', false)->get();
+            $dMessagesForCount = $this->container->directMessage->where('receiver_id', $this->container->site->auth->id)->where('viewed', false)->where('deleted', true)->get();
+
+            return $this->render('auth/messages', [
+                'messages' => $this->container->site->auth->getDirectMessages(),
+            ]);
+        }
 
       public function getViewDirectMessage() {
           $messageId = $this->request->getAttribute('id');
@@ -318,20 +321,82 @@ class AuthController extends Controller {
           }
       }
 
-      public function postHideDirectMessage() {
-          $messageId = $this->request->getAttribute('id');
+    public function postTrashDirectMessages() {
+        $user = $this->container->site->auth;
+        $rawSelectedMessages = $this->request->getParsedBody()['selectedMessages'];
 
-          $rawMessage = $this->container->directMessage->where('id', $messageId)->first();
+        $selectedMessages = explode(',', $rawSelectedMessages[0]);
 
-          if(!$rawMessage || $rawMessage && $rawMessage->receiver_id !== $this->container->site->auth->id) {
-              return $this->redirectTo('auth.messages');
-          } else {
-              $rawMessage->update([
-                  'deleted' => true,
-              ]);
+        foreach($selectedMessages as $selectedMessage) {
+            $message = $this->container->directMessage->where('id', $selectedMessage)->first();
 
-              $this->flash('notySuccess', 'That message has been added to trash!');
-              return $this->redirectTo('auth.messages');
-          }
-      }
+            if($user->id === $message->receiver_id) {
+                $message->update([
+                    'deleted' => true,
+                ]);
+            }
+        }
+
+        if(count($selectedMessages) > 1)
+            $this->flash('notySuccess', "You have added those messages to your trash!");
+        else
+            $this->flash('notySuccess', "You have added that message to your trash!");
+
+        return $this->redirectTo('auth.messages');
+    }
+
+    public function postRestoreDirectMessages() {
+        $user = $this->container->site->auth;
+        $rawSelectedMessages = $this->request->getParsedBody()['selectedMessages'];
+
+        $selectedMessages = explode(',', $rawSelectedMessages[0]);
+
+        foreach($selectedMessages as $selectedMessage) {
+            $message = $this->container->directMessage->where('id', $selectedMessage)->first();
+
+            if($user->id === $message->receiver_id) {
+                $message->update([
+                    'deleted' => false,
+                ]);
+            }
+        }
+
+        if(count($selectedMessages) > 1)
+            $this->flash('notySuccess', "You have restored those messages to back to your Inbox!");
+        else
+            $this->flash('notySuccess', "You have restored that message to back to your Inbox!");
+
+        return $this->redirectTo('auth.messages');
+    }
+
+    public function getTrashedMessages() {
+        $uMessagesForCount = $this->container->directMessage->where('receiver_id', $this->container->site->auth->id)->where('viewed', false)->where('deleted', false)->get();
+        $dMessagesForCount = $this->container->directMessage->where('receiver_id', $this->container->site->auth->id)->where('viewed', false)->where('deleted', true)->get();
+
+        return $this->render('auth/trashedMessages', [
+            'messages' => $this->container->site->auth->getDirectMessages(true),
+        ]);
+    }
+
+    public function postDeleteDirectMessages() {
+        $user = $this->container->site->auth;
+        $rawSelectedMessages = $this->request->getParsedBody()['selectedMessages'];
+
+        $selectedMessages = explode(',', $rawSelectedMessages[0]);
+
+        foreach($selectedMessages as $selectedMessage) {
+            $message = $this->container->directMessage->where('id', $selectedMessage)->first();
+
+            if($user->id === $message->receiver_id) {
+                $message->delete();
+            }
+        }
+
+        if(count($selectedMessages) > 1)
+            $this->flash('notySuccess', "You have delete those messages, forever!");
+        else
+            $this->flash('notySuccess', "You have deleted that message, forever!");
+
+        return $this->redirectTo('auth.messages');
+    }
 }

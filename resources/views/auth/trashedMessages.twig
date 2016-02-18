@@ -15,15 +15,15 @@
 <div class="container">
     <div class="col-lg-12">
         <div class="page-header">
-            <h1>Direct Messages | Inbox</h1>
+            <h1>Direct Messages | Trash</h1>
         </div>
         <div class="row">
             <div class="col-sm-3 col-md-2">
                 <button type="button" class="btn btn-danger btn-sm btn-block" data-toggle="modal" data-target="#composeMessage">COMPOSE</button>
                 <hr>
                 <ul class="nav nav-pills nav-stacked">
-                    <li class="active"><a href="#"><span class="badge pull-right" id="inboxCount">0</span> Inbox </a></li>
-                    <li><a href="{{ path_for('auth.messages.trash') }}"> <span class="badge pull-right" id="trashCount">0</span> Trash </a></li>
+                    <li><a href="{{ path_for('auth.messages') }}"><span class="badge pull-right" id="inboxCount">0</span> Inbox</a></li>
+                    <li class="active"><a href="#"><span class="badge pull-right" id="trashCount">0</span> Trash </a></li>
                 </ul>
             </div>
             <div class="col-sm-9 col-md-10">
@@ -40,12 +40,21 @@
                     </ul>
                 </div>
                 <div class="pull-right">
-                    <form action="{{ path_for('auth.messages.edit.trash') }}" method="post" id="deleteForm">
+                    <form action="{{ path_for('auth.messages.edit.delete') }}" method="post" id="deleteForm">
                         <input type="hidden" name="csrf_name" value="{{ csrf_name }}">
                         <input type="hidden" name="csrf_value" value="{{ csrf_token }}">
                         <button type="submit" class="btn btn-danger" id="deleteButton"><i class="fa fa-trash"></i></button>
                     </form>
                 </div>
+                <div class="pull-right" style="margin-right: 5px;">
+                    <form action="{{ path_for('auth.messages.edit.restore') }}" method="post" id="restoreForm">
+                        <input type="hidden" name="csrf_name" value="{{ csrf_name }}">
+                        <input type="hidden" name="csrf_value" value="{{ csrf_token }}">
+                        <button type="submit" class="btn btn-primary" id="restoreButton"><i class="fa fa-undo"></i></button>
+                    </form>
+                </div>
+
+                <div class="clearfix"></div>
                 <hr  style="margin-top: 17px;">
                 <div class="list-group">
                     {% if not messages is empty %}
@@ -64,7 +73,7 @@
                         {% endfor %}
                     {% else %}
                         <p class="text-center">
-                            <i><b>No new messages.</b></i>
+                            <i><b>No conversations in the Trash.</b></i>
                         </p>
                     {% endif %}
                 </div>
@@ -156,7 +165,6 @@
             }
         });
 
-
         selectedMessage.click(function() {
             if(this.checked) {
                 if($.inArray($(this).val(), selectedMessages) === -1)
@@ -224,7 +232,54 @@
                     value: selectedMessages
                 }).appendTo(deleteForm);
 
-                deleteForm.submit();
+                swal({
+                  title: 'Are you sure?',
+                  text: 'If you click delete, the messages you selected will be deleted forever!',
+                  type: 'error',
+                  showCancelButton: true,
+                  confirmButtonColor: '#F44336',
+                  cancelButtonColor: '#2196F3',
+                  confirmButtonText: 'Delete',
+                  cancelButtonText: 'Nevermind',
+                  closeOnConfirm: true,
+                  closeOnCancel: true
+                }, function(isConfirm) {
+                  if(isConfirm) {
+                      deleteForm.submit();
+                  }
+                });
+            }
+        });
+
+        var restoreForm = $('#restoreForm');
+        var restoreButton = $('#restoreButton');
+
+        restoreButton.click(function(e) {
+            e.preventDefault();
+            if(selectedMessages.length === 0) {
+                noty({
+                    layout: "topRight",
+                    theme: "relax",
+                    type: "information",
+                    text: "<strong>Oops!</strong> <br /> Please select the messages you want to restore.",
+                    timeout: 4000,
+                    dismissQueue: true,
+                    buttons: false,
+                    killer: true,
+                    animation: {
+                        open: 'animated bounceInLeft',
+                        close: 'animated bounceOutRight'
+                    }
+                });
+            } else {
+                $("<input>").attr({
+                    type: 'hidden',
+                    id: 'selectedMessagesForm',
+                    name: 'selectedMessages[]',
+                    value: selectedMessages
+                }).appendTo(restoreForm);
+
+                restoreForm.submit();
             }
         });
 

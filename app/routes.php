@@ -29,12 +29,21 @@ $site->group('/auth', function() {
 
     $this->authRoute(['GET'], '/messages', \Savage\Http\Controllers\AuthController::class, 'directMessages')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages');
 
+    $this->authRoute(['GET'], '/messages/trash', \Savage\Http\Controllers\AuthController::class, 'trashedMessages')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages.trash');
+
+
     $this->authRoute(['GET', 'POST'], '/messages/view/{id}', Savage\Http\Controllers\AuthController::class, 'viewDirectMessage')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages.view');
 
     $this->authRoute(['POST'], '/messages/compose', Savage\Http\Controllers\AuthController::class, 'composeMessage')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages.compose');
 
     // Temp Delete
-    $this->authRoute(['POST'], '/messages/hide/{id}', Savage\Http\Controllers\AuthController::class, 'hideDirectMessage')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages.hide');
+    $this->authRoute(['POST'], '/messages/edit/trash', Savage\Http\Controllers\AuthController::class, 'trashDirectMessages')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages.edit.trash');
+
+    // Restore
+    $this->authRoute(['POST'], '/messages/edit/restore', Savage\Http\Controllers\AuthController::class, 'restoreDirectMessages')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages.edit.restore');
+
+    // Delete Forever!
+    $this->authRoute(['POST'], '/messages/edit/delete', Savage\Http\Controllers\AuthController::class, 'deleteDirectMessages')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages.edit.delete');
 
 });
 

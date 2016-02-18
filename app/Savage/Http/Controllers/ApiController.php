@@ -85,6 +85,8 @@ class ApiController extends Controller
                 ->where('deleted', false)
                 ->get(),
             'total' => $user->directMessages()->count(),
+            'unread_total' => $this->container->directMessage->where('receiver_id', $this->container->site->auth->id)->where('viewed', false)->where('deleted', false)->count(),
+            'trash_total' => $this->container->directMessage->where('receiver_id', $this->container->site->auth->id)->where('deleted', true)->count(),
         ];
 
         return $this->response($data);

@@ -78,6 +78,7 @@ class User extends Eloquent
         return $this->directMessages()
             ->join('users', 'direct_messages.sender_id', '=', 'users.id')
             ->select('direct_messages.*', 'users.username as sender_username', 'users.first_name as sender_first_name', 'users.last_name as sender_last_name')
+
             ->orderBy('direct_messages.created_at', 'DESC')
             ->where('deleted', $deleted)
             ->get();
