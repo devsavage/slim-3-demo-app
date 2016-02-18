@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS `direct_messages` (
   `receiver_id` int(11) NOT NULL,
   `sender_id` int(11) NOT NULL,
   `viewed` tinyint(1) NOT NULL,
+  `deleted` tinyint(1) NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)

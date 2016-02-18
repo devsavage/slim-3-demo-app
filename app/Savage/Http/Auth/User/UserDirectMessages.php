@@ -8,7 +8,7 @@ class UserDirectMessages extends Eloquent
 {
     protected $table = 'direct_messages';
 
-    protected $fillable = ['subject', 'body', 'receiver_id', 'sender_id', 'viewed'];
+    protected $fillable = ['subject', 'body', 'receiver_id', 'sender_id', 'viewed', 'deleted'];
 
     public function sendMessage($toId, $fromId, $subject, $message) {
         return $this->create([

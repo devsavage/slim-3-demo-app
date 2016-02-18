@@ -46,7 +46,7 @@ class Validator extends Violin
         $this->addRuleMessages([
             'matchesCurrentPassword' => 'Your current password is incorrect.',
             'validUsername' => 'The username you entered was not found.',
-            'notAuthUsername' => 'Please enter a valid username.',
+            'notAuthUsername' => 'You have entered in your username. Please enter another username.',
         ]);
     }
 

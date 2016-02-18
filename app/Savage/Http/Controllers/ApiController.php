@@ -82,11 +82,36 @@ class ApiController extends Controller
                 ->join('users', 'direct_messages.sender_id', '=', 'users.id')
                 ->select('direct_messages.*', 'users.username as sender_username', 'users.first_name as sender_first_name', 'users.last_name as sender_last_name')
                 ->orderBy('direct_messages.created_at', 'DESC')
+                ->where('deleted', false)
                 ->get(),
             'total' => $user->directMessages()->count(),
         ];
 
         return $this->response($data);
+    }
+
+    public function postDeleteDirectMessage() {
+        $user = $this->container->site->auth;
+
+        $messageId = $this->request->getParsedBody()['id'];
+
+        if(!$user) return $this->response(['status' => 401, 'message' => 'Not authorized']);
+
+        $message = $user->directMessages()->where('id', $messageId)->first();
+
+        if($message) {
+            if($message->receiver_id === $user->id) {
+                $message->update([
+                    'deleted' => true,
+                ]);
+
+                return $this->response(['status' => 200, 'message' => 'Message has been deleted']);
+            } else {
+                return $this->response(['status' => 401, 'message' => 'You are not authorized to delete this message.']);
+            }
+        } else {
+            return $this->response(['status' => 404, 'message' => 'The message you are looking for cannot be found.']);
+        }
     }
 
     private function response($data = []) {

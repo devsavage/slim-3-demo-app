@@ -33,6 +33,9 @@ $site->group('/auth', function() {
 
     $this->authRoute(['POST'], '/messages/compose', Savage\Http\Controllers\AuthController::class, 'composeMessage')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages.compose');
 
+    // Temp Delete
+    $this->authRoute(['POST'], '/messages/hide/{id}', Savage\Http\Controllers\AuthController::class, 'hideDirectMessage')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages.hide');
+
 });
 
 $site->group('/admin', function() {
@@ -55,4 +58,5 @@ $site->group('/admin', function() {
 $site->group('/api', function() {
     $this->authRoute(['GET', 'POST'], '/notifications', Savage\Http\Controllers\ApiController::class, 'notifications')->setName('api.notifications');
     $this->authRoute(['GET'], '/messages', Savage\Http\Controllers\ApiController::class, 'directMessages')->setName('api.messages');
+    $this->authRoute(['POST'], '/messages/delete', Savage\Http\Controllers\ApiController::class, 'deleteDirectMessage')->setName('api.messages.delete');
 });

@@ -2,6 +2,15 @@
 
 {% block styles %}
 <style media="screen">
+.list-group > #delete {
+    float: right;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+.list-group-item {
+    z-index: -1;
+}
 .list-group-item:first-child {border-top-right-radius: 0px;border-top-left-radius: 0px;}
 .list-group-item:last-child {border-bottom-right-radius: 0px;border-bottom-left-radius: 0px;}
 .nav-pills>li>a {padding: 5px 10px;}
@@ -20,20 +29,28 @@
                 <button type="button" class="btn btn-danger btn-sm btn-block" data-toggle="modal" data-target="#composeMessage">COMPOSE</button>
                 <hr>
                 <ul class="nav nav-pills nav-stacked">
-                    <li class="active"><a href="#"><span class="badge pull-right">42</span> Inbox </a>
-                    </li>
+                    <li class="active"><a href="#"><span class="badge pull-right">42</span> Inbox </a></li>
+                    <li><a href="#"><span class="badge pull-right">1</span> Trash </a></li>
                 </ul>
             </div>
             <div class="col-sm-9 col-md-10">
                 <div class="list-group">
                     {% if not messages is empty %}
                         {% for message in messages %}
-                            <a href="{{ path_for('auth.messages.view', {id: message.id}) }}" class="list-group-item {% if not message.viewed %}list-group-item-success{% endif %}">
+                            <div id="delete">
+                                <form method="POST" action="{{ path_for('auth.messages.hide', {id: message.id}) }}">
+                                    <input type="hidden" name="csrf_name" value="{{ csrf_name }}">
+                                    <input type="hidden" name="csrf_value" value="{{ csrf_token }}">
+                                    <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                                </form>
+                            </div>
+                            <a href="{{ path_for('auth.messages.view', {id: message.id}) }}" class="list-group-item {% if not message.viewed %}list-group-item-success{% endif %}" >
                                 <span id="name" style="min-width: 120px;display: inline-block;">{{ message.sender_first_name }} {{ message.sender_last_name }}</span>
                                 <span id="subject" style="font-size: 14px; font-weight: bold;">{{ message.subject }}</span>
                                 <span id="body" class="text-muted" style="font-size: 12px;">{{ message.body[:20] }}{% if message.body|length > 20 %}...{% endif %}</span>
-                                <span id="time" class="badge">{{ message.created_at|date('m/d/Y') }}</span>
+                                <span id="time" class="badge">{{ message.created_at|date('m/d/Y') }} </span>
                             </a>
+
                         {% endfor %}
                     {% else %}
                         <p class="text-center">
@@ -100,7 +117,7 @@
             layout: "topRight",
             theme: "relax",
             type: "success",
-            text: "<strong>Success!</strong> Your message has been sent!",
+            text: "<strong>Success!</strong> {{ flash.getMessage('notySuccess').0 }}",
             timeout: 4000,
             buttons: false,
             animation: {

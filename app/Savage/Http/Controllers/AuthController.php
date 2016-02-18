@@ -235,6 +235,7 @@ class AuthController extends Controller {
       public function getDirectMessages() {
          return $this->render('auth/messages', [
              'messages' => $this->container->site->auth->getDirectMessages(),
+             'deleted_messages' => $this->container->site->auth->getDirectMessages(true),
          ]);
       }
 
@@ -254,7 +255,7 @@ class AuthController extends Controller {
             ->first();
 
           $message->update([
-              'viewed' => true, 
+              'viewed' => true,
           ]);
 
           return $this->render('auth/viewMessage', [
@@ -314,6 +315,23 @@ class AuthController extends Controller {
 
                   return $this->redirectTo('auth.messages');
               }
+          }
+      }
+
+      public function postHideDirectMessage() {
+          $messageId = $this->request->getAttribute('id');
+
+          $rawMessage = $this->container->directMessage->where('id', $messageId)->first();
+
+          if(!$rawMessage || $rawMessage && $rawMessage->receiver_id !== $this->container->site->auth->id) {
+              return $this->redirectTo('auth.messages');
+          } else {
+              $rawMessage->update([
+                  'deleted' => true,
+              ]);
+
+              $this->flash('notySuccess', 'That message has been added to trash!');
+              return $this->redirectTo('auth.messages');
           }
       }
 }
