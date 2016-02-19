@@ -1,3 +1,4 @@
 config/*.php
 vendor/
 *.lock
+public/error_log
