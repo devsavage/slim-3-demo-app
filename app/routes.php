@@ -36,6 +36,8 @@ $site->group('/auth', function() {
 
     $this->authRoute(['POST'], '/messages/compose', Savage\Http\Controllers\AuthController::class, 'composeMessage')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages.compose');
 
+    $this->authRoute(['POST'], '/messages/reply/{id}', Savage\Http\Controllers\AuthController::class, 'directMessageResponse')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages.reply');
+
     // Temp Delete
     $this->authRoute(['POST'], '/messages/edit/trash', Savage\Http\Controllers\AuthController::class, 'trashDirectMessages')->add(new \Savage\Http\Filters\AuthFilter($this))->setName('auth.messages.edit.trash');
 

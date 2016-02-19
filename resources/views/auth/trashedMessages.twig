@@ -128,6 +128,7 @@
 <script type="text/javascript">
 
     $(function() {
+
     {% if flash.getMessage('error').0 %}
         $("#composeMessage").modal('show');
     {% endif %}
@@ -156,12 +157,22 @@
         var selectedMessage = $("[id=message-select]");
         var selectedMessages = [];
 
+        $("#inboxCount").hide();
+        $("#trashCount").hide();
+
         $.ajax({
             url: "{{ path_for('api.messages') }}",
             dataType: "json",
             success: function(data) {
-                $("#inboxCount").html(data.unread_total);
-                $("#trashCount").html(data.trash_total);
+                if(data.unread_total !== 0) {
+                    $("#inboxCount").html(data.unread_total);
+                    $("#inboxCount").show();
+                }
+
+                if(data.trash_total !== 0) {
+                    $("#trashCount").html(data.unread_total);
+                    $("#trashCount").show();
+                }
             }
         });
 

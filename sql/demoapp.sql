@@ -17,7 +17,7 @@ USE `demoapp`;
 
 -- Dumping structure for table demoapp.direct_messages
 CREATE TABLE IF NOT EXISTS `direct_messages` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `subject` varchar(75) DEFAULT NULL,
   `body` text NOT NULL,
   `receiver_id` int(11) NOT NULL,
@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS `direct_messages` (
   `deleted` tinyint(1) NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  CONSTRAINT `dmr_message_id_foreign` FOREIGN KEY (`id`) REFERENCES `direct_messages_responses` (`message_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -40,7 +41,9 @@ CREATE TABLE IF NOT EXISTS `direct_messages_responses` (
   `sender_id` int(11) NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `dm_message_id_foreign` (`message_id`),
+  CONSTRAINT `dm_message_id_foreign` FOREIGN KEY (`message_id`) REFERENCES `direct_messages` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.

@@ -34,6 +34,22 @@
     <script src="{{ asset('js/sweetalert.min.js') }}"></script>
     <script src="{{ asset('js/jquery.noty.min.js') }}"></script>
     <script src="{{ asset('js/app.min.js') }}"></script>
+    <script type="text/javascript">
+    {% if flash.getMessage('notySuccess').0 %}
+        noty({
+            layout: "topRight",
+            theme: "relax",
+            type: "success",
+            text: "<strong>Success!</strong> <br> {{ flash.getMessage('notySuccess').0 }}",
+            timeout: 4000,
+            buttons: false,
+            animation: {
+                open: 'animated bounceInLeft',
+                close: 'animated bounceOutRight'
+            }
+        });
+    {% endif %}
+    </script>
     {% block scripts %}
     {% endblock %}
   </body>

@@ -257,12 +257,19 @@ class AuthController extends Controller {
             ->select('direct_messages.*', 'users.username as sender_username', 'users.first_name as sender_first_name', 'users.last_name as sender_last_name')
             ->first();
 
+          $responses = $this->container->directMessageResponse->where('message_id', $message->id)
+            ->join('users', 'direct_messages_responses.sender_id', '=', 'users.id')
+            ->select('direct_messages_responses.*', 'users.username as owner_username', 'users.first_name as owner_first_name', 'users.last_name as owner_last_name')
+            ->orderBy('created_at', 'DESC')
+            ->get();
+
           $message->update([
               'viewed' => true,
           ]);
 
           return $this->render('auth/viewMessage', [
               'message' => $message,
+              'responses' => $responses,
           ]);
       }
 
@@ -398,5 +405,29 @@ class AuthController extends Controller {
             $this->flash('notySuccess', "You have deleted that message, forever!");
 
         return $this->redirectTo('auth.messages');
+    }
+
+    public function postDirectMessageResponse() {
+         $messageId = $this->request->getAttribute('id');
+
+         $message = $this->container->directMessage->where('id', $messageId)->first();
+
+         if($message) {
+             $rawResponse = $this->data()->response;
+
+             $this->container->directMessageResponse->create([
+                 'message_id' => $messageId,
+                 'body' => $rawResponse,
+                 'sender_id' => $this->container->site->auth->id,
+             ]);
+
+             $this->flash('notySuccess', 'Your reply has been sent!');
+
+             return $this->redirectTo("auth.messages.view", [
+                 'id' => $message->id,
+             ]);
+         }
+
+         return $this->redirectTo('auth.messages');
     }
 }

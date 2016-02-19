@@ -122,20 +122,6 @@
     {% if flash.getMessage('error').0 %}
         $("#composeMessage").modal('show');
     {% endif %}
-    {% if flash.getMessage('notySuccess').0 %}
-        noty({
-            layout: "topRight",
-            theme: "relax",
-            type: "success",
-            text: "<strong>Success!</strong> {{ flash.getMessage('notySuccess').0 }}",
-            timeout: 4000,
-            buttons: false,
-            animation: {
-                open: 'animated bounceInLeft',
-                close: 'animated bounceOutRight'
-            }
-        });
-    {% endif %}
         // Rough! I don't reccommend using this.. but it works.
         var selectContainer = $("#selectionContainer");
         var selectTypeDefault = $("#selection");
@@ -147,12 +133,22 @@
         var selectedMessage = $("[id=message-select]");
         var selectedMessages = [];
 
+        $("#inboxCount").hide();
+        $("#trashCount").hide();
+
         $.ajax({
             url: "{{ path_for('api.messages') }}",
             dataType: "json",
             success: function(data) {
-                $("#inboxCount").html(data.unread_total);
-                $("#trashCount").html(data.trash_total);
+                if(data.unread_total !== 0) {
+                    $("#inboxCount").html(data.unread_total);
+                    $("#inboxCount").show();
+                }
+
+                if(data.trash_total !== 0) {
+                    $("#trashCount").html(data.unread_total);
+                    $("#trashCount").show();
+                }
             }
         });
 
