@@ -39,6 +39,7 @@
                             </div>
                         {% endif %}
                         <h3>{{ message.sender_first_name }} {{ message.sender_last_name }} <span class="text-muted">({{ message.sender_username }})</span></h3>
+                        <h4>Received: <span class="text-muted">{{ message.created_at|date("m/d/Y") }}</span></h4>
                         <hr>
                         <p>
                             <div class="messsage">
