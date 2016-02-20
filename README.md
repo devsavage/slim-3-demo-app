@@ -9,7 +9,8 @@ I will continue to add more features as I see fit, soon.
 | Feature        | Description           | Status  |
 | ------------- |:-------------:| -----:|
 | CSRF Protection      | Cross-Site Request Forgery protection. | Feature Complete |
-| Authenticatuion      | A fully featured authentication system. | Feature Complete |
+| Authentication      | A fully featured authentication system. | Feature Complete |
+| Direct Messaging      | A simple way to message other users. | In Progress |
 
 ## Installation
 You will need to use [Composer](https://getcomposer.org/) as well as PHP 5.5 or newer.  
@@ -21,10 +22,10 @@ $ composer install
 + You will need to update the config file to suit your needs.  You can find the config file in **config/container.config.php**  
 + You will also need to create the databases. After you setup your database info in the config, you can run the SQL files in the sql folder.  
 + Once your database is set up, you can register for an account on the site.  
-+ You will manually need to give yourself administrator privilages by using a database manager, such as phpMyAdmin, and updating: **permissions->is_head_admin** and set it to **1**.  
++ You will manually need to give yourself administrator privileges by using a database manager, such as phpMyAdmin, and updating: **permissions->is_head_admin** and set it to **1**.  
 
 ## Configurartion
-Here is an example configuration file. You will want to place this file in a **config** folder as a php file. I reccommend naming it **container.config.php** so you won't need to update anything in the bootstrap file.  
+Here is an example configuration file. You will want to place this file in a **config** folder as a php file. I recommend naming it **container.config.php** so you won't need to update anything in the bootstrap file.  
 You will need to update **app/bootstrap.php** with the location to your config file within the instantiation of the **Slim/App** class.  
 
 ```php
@@ -69,7 +70,7 @@ return [
     'flash' => function() {
       return new \Slim\Flash\Messages;
     },
-	
+
     'search' => function() {
 		// Application ID & Admin API Key
         return new \AlgoliaSearch\Client("••••••••••", "••••••••••••••••••••••••••••••••");
