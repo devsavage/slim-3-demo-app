@@ -26,8 +26,7 @@ CREATE TABLE IF NOT EXISTS `direct_messages` (
   `deleted` tinyint(1) NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `dmr_message_id_foreign` FOREIGN KEY (`id`) REFERENCES `direct_messages_responses` (`message_id`) ON DELETE CASCADE
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -35,15 +34,14 @@ CREATE TABLE IF NOT EXISTS `direct_messages` (
 
 -- Dumping structure for table demoapp.direct_messages_responses
 CREATE TABLE IF NOT EXISTS `direct_messages_responses` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `message_id` int(11) NOT NULL,
   `body` text NOT NULL,
   `sender_id` int(11) NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `dm_message_id_foreign` (`message_id`),
-  CONSTRAINT `dm_message_id_foreign` FOREIGN KEY (`message_id`) REFERENCES `direct_messages` (`id`) ON DELETE CASCADE
+  KEY `dm_message_id_foreign` (`message_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.

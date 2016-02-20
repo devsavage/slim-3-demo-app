@@ -2,6 +2,7 @@
 
 $site->route(['GET'], '/', \Savage\Http\Controllers\HomeController::class)->setName('home');
 $site->authRoute(['GET'], '/tests', \Savage\Http\Controllers\TestController::class, 'index')->setName('tests');
+$site->authRoute(['GET'], '/fakesomedata', \Savage\Http\Controllers\FakeController::class, 'index')->setName('fake.faker');
 
 $site->get('/auth/logout', function($request, $response, $args) use ($site) {
     \Savage\Http\Util\Session::delete($site->getContainer()->settings['auth']['session']);
