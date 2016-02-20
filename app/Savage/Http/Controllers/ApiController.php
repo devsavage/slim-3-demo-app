@@ -116,6 +116,23 @@ class ApiController extends Controller
         }
     }
 
+    public function getUsernameList() {
+        // We only want this available to users who are signed in.
+        if(!$this->container->site->auth) return $this->response(['status' => '403', 'message' => 'Access denied.']);
+
+        $users = $this->container->user->select('users.id', 'users.username')->get();
+
+        $usernames = [];
+
+        foreach ($users as $user) {
+            $user['objectID'] = $user->id;
+            $user['username'] = $user->username;
+            array_push($usernames, $user);
+        }
+
+        return $this->response->withHeader('Content-type', 'application/json')->withStatus(200)->write(json_encode($usernames));
+    }
+
     private function response($data = []) {
         if(empty($data) || !isset($data['status'])) return;
 

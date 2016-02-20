@@ -1,6 +1,7 @@
 {% extends 'templates/layout.twig' %}
 
 {% block styles %}
+<link rel="stylesheet" href="{{ asset('css/typeahead.min.css') }}">
 <style media="screen">
 .list-group-item:first-child {border-top-right-radius: 0px;border-top-left-radius: 0px;}
 .list-group-item:last-child {border-bottom-right-radius: 0px;border-bottom-left-radius: 0px;}
@@ -77,10 +78,10 @@
                     <h4 class="modal-title" id="composeMessageLabel">New message</h4>
                   </div>
                   <div class="modal-body">
-                    <form action="{{ path_for('auth.messages.compose') }}" method="POST">
+                    <form action="{{ path_for('auth.messages.compose') }}" method="POST" autocomplete="off">
                         <div class="form-group{% if flash.getMessage('message_recipient_error').0 %} has-error{% endif %}">
                             <label for="message-recipient" class="control-label">Recipient:</label>
-                            <input type="text" class="form-control" id="message-recipient" name="message_recipient" value="{{ flash.getMessage('recipient').0 }}">
+                            <input type="text" class="form-control typeahead" id="message-recipient" name="message_recipient" value="{{ flash.getMessage('recipient').0 }}">
                             {% if flash.getMessage('message_recipient_error').0 %}
                                 <p class="help-block text-danger">{{ flash.getMessage('message_recipient_error').0 }}</p>
                             {% endif %}
@@ -116,9 +117,14 @@
 </div>
 {% endblock %}
 {% block scripts %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/algoliasearch/3.11.0/algoliasearch.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.5/typeahead.jquery.min.js"></script>
 <script type="text/javascript">
 
+
     $(function() {
+        var client = algoliasearch('9YSTW5T76P', 'd36a9cdf7fbc537cabf6c0c90f2b4161');
+        var usernamesIndex = client.initIndex('demoapp_usernames');
     {% if flash.getMessage('error').0 %}
         $("#composeMessage").modal('show');
     {% endif %}
@@ -150,6 +156,13 @@
                     $("#trashCount").show();
                 }
             }
+        });
+
+        $('#message-recipient').typeahead(null, {
+            source: usernamesIndex.ttAdapter({
+                'hitsPerPage': 5
+            }),
+            displayKey: 'username'
         });
 
 

@@ -58,6 +58,10 @@ return [
       return new \Savage\Http\Auth\User\UserDirectMessages;
     },
 
+    'directMessageResponse' => function() {
+      return new \Savage\Http\Auth\User\UserDiretMessageResponses;
+    },
+
     'util' => function() {
       return new \Savage\Http\Util\Utils;
     },
@@ -65,9 +69,10 @@ return [
     'flash' => function() {
       return new \Slim\Flash\Messages;
     },
-
-    'csrf' => function () {
-      return new \Slim\Csrf\Guard;
+	
+    'search' => function() {
+		// Application ID & Admin API Key
+        return new \AlgoliaSearch\Client("••••••••••", "••••••••••••••••••••••••••••••••");
     },
 
     'view' => function($c) {
@@ -111,9 +116,9 @@ return [
                 ->withStatus(405)->withRedirect($c['router']->pathFor('home'));
         };
     },
-
+	// If you are in a development environment, I recommend disabling this
     'errorHandler' => function($c) {
-        return function ($request, $response, $methods) use ($c) {
+	    return function ($request, $response, $methods) use ($c) {
             return $c['response']->withStatus(500)->withHeader('Content-Type', 'text/html')->write('Something went wrong!');
         };
     },
@@ -148,7 +153,6 @@ return [
         return $guard;
     }
 ];
-
 ```
 
 ## Framework
@@ -181,6 +185,9 @@ Here is a list of most of the packages that make this app work.
 + [RandomLib](https://packagist.org/packages/ircmaxell/random-lib)
     - 1.1
     - A library for generating random numbers and strings of various strengths.
++ [Algolia](https://packagist.org/packages/algolia/algoliasearch-client-php)
+	- 1.7
+	- A search API
 
 
 ## License

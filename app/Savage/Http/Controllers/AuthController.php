@@ -233,6 +233,19 @@ class AuthController extends Controller {
       */
 
         public function getDirectMessages() {
+            // I guess we can do this here....
+            $usernamesIndex = $this->container->search->initIndex('demoapp_usernames');
+            $users = $this->container->user->select('users.id', 'users.username')->get();
+
+            $usernames = [];
+
+            foreach ($users as $user) {
+                $user['objectID'] = $user->id;
+                $user['username'] = $user->username;
+                array_push($usernames, $user);
+            }
+
+            $usernamesIndex->saveObjects($usernames);
 
             $uMessagesForCount = $this->container->directMessage->where('receiver_id', $this->container->site->auth->id)->where('viewed', false)->where('deleted', false)->get();
             $dMessagesForCount = $this->container->directMessage->where('receiver_id', $this->container->site->auth->id)->where('viewed', false)->where('deleted', true)->get();
