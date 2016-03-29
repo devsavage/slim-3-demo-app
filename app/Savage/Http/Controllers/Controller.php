@@ -6,13 +6,12 @@ use Savage\Http\Util\Session;
 
 class Controller
 {
-    protected $request;
-    protected $response;
-    protected $container;
+    protected $request, $response, $args, $container;
 
-    public function __construct($request, $response, $container) {
+    public function __construct($request, $response, $args, $container) {
         $this->request = $request;
         $this->response = $response;
+        $this->args = $args;
         $this->container = $container;
     }
 

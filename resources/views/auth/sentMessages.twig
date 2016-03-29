@@ -1,7 +1,6 @@
 {% extends 'templates/layout.twig' %}
 
 {% block styles %}
-<link rel="stylesheet" href="{{ asset('css/typeahead.min.css') }}">
 <style media="screen">
 .list-group-item:first-child {border-top-right-radius: 0px;border-top-left-radius: 0px;}
 .list-group-item:last-child {border-bottom-right-radius: 0px;border-bottom-left-radius: 0px;}
@@ -16,15 +15,15 @@
 <div class="container">
     <div class="col-lg-12">
         <div class="page-header">
-            <h1>Direct Messages | Inbox</h1>
+            <h1>Direct Messages | Sent</h1>
         </div>
         <div class="row">
             <div class="col-sm-3 col-md-2">
                 <button type="button" class="btn btn-danger btn-sm btn-block" data-toggle="modal" data-target="#composeMessage">COMPOSE</button>
                 <hr>
                 <ul class="nav nav-pills nav-stacked">
-                    <li class="active"><a href="#"><span class="badge pull-right" id="inboxCount">0</span> Inbox </a></li>
-                    <li><a href="{{ path_for('auth.messages.sent') }}"> Sent </a></li>
+                    <li><a href="{{ path_for('auth.messages') }}"><span class="badge pull-right" id="inboxCount">0</span> Inbox</a></li>
+                    <li class="active"><a href="#"> Sent </a></li>
                     <li><a href="{{ path_for('auth.messages.trash') }}">Trash </a></li>
                 </ul>
             </div>
@@ -48,19 +47,17 @@
                         <button type="submit" class="btn btn-danger" id="deleteButton"><i class="fa fa-trash"></i></button>
                     </form>
                 </div>
+                <div class="clearfix"></div>
                 <hr  style="margin-top: 17px;">
                 <div class="list-group">
                     {% if not messages is empty %}
                         {% for message in messages %}
-                            <a href="{{ path_for('auth.messages.view', {id: message.id}) }}" class="list-group-item {% if not message.viewed %}list-group-item-success{% else %}list-group-item-default{% endif %}">
+                            <a href="{{ path_for('auth.messages.view', {id: message.id}) }}" class="list-group-item list-group-item-default">
                                 <div class="checkbox">
                                     <label>
                                         <input type="checkbox" id="message-select" value="{{ message.id }}">
                                     </label>
                                 </div>
-                                {% if message.has_new_reply %}
-                                    <span id="hasNewReply"><i class="fa fa-reply"></i></span>
-                                {% endif %}
                                 <span id="name" style="min-width: 120px;display: inline-block;">{{ message.sender_first_name }} {{ message.sender_last_name }}</span>
                                 <span id="subject" style="font-size: 14px; font-weight: bold;">{{ message.subject }}</span>
                                 <span id="body" class="text-muted" style="font-size: 12px;">{{ message.body[:20] }}{% if message.body|length > 20 %}...{% endif %}</span>
@@ -69,66 +66,20 @@
                         {% endfor %}
                     {% else %}
                         <p class="text-center">
-                            <i><b>No new messages.</b></i>
+                            <i><b>You have not sent any messages recently.</b></i>
                         </p>
                     {% endif %}
                 </div>
-            </div>
-            <div class="modal fade" id="composeMessage" tabindex="-1" role="dialog" aria-labelledby="composeMessageLabel">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="composeMessageLabel">New message</h4>
-                  </div>
-                  <div class="modal-body">
-                    <form action="{{ path_for('auth.messages.compose') }}" method="POST" autocomplete="off">
-                        <div class="form-group{% if flash.getMessage('message_recipient_error').0 %} has-error{% endif %}">
-                            <label for="message-recipient" class="control-label">Recipient:</label>
-                            <input type="text" class="form-control typeahead" id="message-recipient" name="message_recipient" value="{{ flash.getMessage('recipient').0 }}">
-                            {% if flash.getMessage('message_recipient_error').0 %}
-                                <p class="help-block text-danger">{{ flash.getMessage('message_recipient_error').0 }}</p>
-                            {% endif %}
-                        </div>
-                        <div class="form-group{% if flash.getMessage('message_subject_error').0 %} has-error{% endif %}">
-                            <label for="message-subject" class="control-label">Subject:</label>
-                            <input type="text" class="form-control" id="message-subject" name="message_subject" value="{{ flash.getMessage('subject').0 }}">
-                            {% if flash.getMessage('message_subject_error').0 %}
-                                <p class="help-block text-danger">{{ flash.getMessage('message_subject_error').0 }}</p>
-                            {% endif %}
-                        </div>
-                        <div class="form-group{% if flash.getMessage('message_body_error').0 %} has-error{% endif %}">
-                            <label for="message-body" class="control-label">Message:</label>
-                            <textarea class="form-control" id="message-body" name="message_body">{{ flash.getMessage('body').0 }}</textarea>
-                            {% if flash.getMessage('message_body_error').0 %}
-                                <p class="help-block text-danger">{{ flash.getMessage('message_body_error').0 }}</p>
-                            {% endif %}
-                        </div>
-                        <input type="hidden" name="csrf_name" value="{{ csrf_name }}">
-                        <input type="hidden" name="csrf_value" value="{{ csrf_token }}">
-
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" id="message-send">Send message</button>
-                  </div>
-                  </form>
-                </div>
-              </div>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
 {% block scripts %}
-<script src="//cdnjs.cloudflare.com/ajax/libs/algoliasearch/3.11.0/algoliasearch.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.5/typeahead.jquery.min.js"></script>
 <script type="text/javascript">
 
 
     $(function() {
-        var client = algoliasearch('9YSTW5T76P', 'd36a9cdf7fbc537cabf6c0c90f2b4161');
-        var usernamesIndex = client.initIndex('demoapp_usernames');
     {% if flash.getMessage('error').0 %}
         $("#composeMessage").modal('show');
     {% endif %}
@@ -154,13 +105,6 @@
                     $("#inboxCount").show();
                 }
             }
-        });
-
-        $('#message-recipient').typeahead(null, {
-            source: usernamesIndex.ttAdapter({
-                'hitsPerPage': 5
-            }),
-            displayKey: 'username'
         });
 
 
@@ -230,8 +174,9 @@
                     name: 'selectedMessages[]',
                     value: selectedMessages
                 }).appendTo(deleteForm);
-
+                console.log("???");
                 deleteForm.submit();
+                console.log("???");
             }
         });
 

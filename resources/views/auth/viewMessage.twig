@@ -22,8 +22,9 @@
             </div>
             <div class="col-md-1">
                 <ul class="nav nav-pills nav-stacked">
-                    <li {% if not message.deleted %}class="active"{% endif %}><a href="{{ path_for('auth.messages') }}"><span class="badge pull-right" id="inboxCount">0</span> Inbox</a></li>
-                    <li {% if message.deleted %}class="active"{% endif %}><a href="{{ path_for('auth.messages.trash') }}"><span class="badge pull-right" id="trashCount">0</span> Trash </a></li>
+                    <li {% if not message.deleted and not message.sender_id == auth.id %}class="active"{% endif %}><a href="{{ path_for('auth.messages') }}"><span class="badge pull-right" id="inboxCount">0</span> Inbox</a></li>
+                    <li {% if message.sender_id == auth.id %}class="active"{% endif %}><a href="{{ path_for('auth.messages.sent') }}">Sent</a></li>
+                    <li {% if message.deleted %}class="active"{% endif %}><a href="{{ path_for('auth.messages.trash') }}">Trash </a></li>
                 </ul>
             </div>
                 <div class="col-md-8">
@@ -38,12 +39,14 @@
                                 </form>
                             </div>
                         {% endif %}
-                        <h3>{{ message.sender_first_name }} {{ message.sender_last_name }} <span class="text-muted">({{ message.sender_username }})</span></h3>
+                        <h3>From: {{ message.sender_first_name }} {{ message.sender_last_name }} <span class="text-muted">({{ message.sender_username }})</span></h3>
+                        <h3>To: {{ message.receiver_first_name }} {{ message.receiver_last_name }} <span class="text-muted">({{ message.receiver_username }})</span></h3>
+                        <div class="clearfix"></div>
                         <h4>Received: <span class="text-muted">{{ message.created_at|date("m/d/Y") }}</span></h4>
                         <hr>
                         <p>
                             <div class="messsage">
-                                {{ message.body }}
+                                <h4><b>Message:</b> </h4>   <h3>{{ message.body }}</h3>
                             </div>
                         </p>
                     </div>
@@ -103,7 +106,6 @@
 <script type="text/javascript">
     $(function() {
         $("#inboxCount").hide();
-        $("#trashCount").hide();
 
         $.ajax({
             url: "{{ path_for('api.messages') }}",
@@ -112,11 +114,6 @@
                 if(data.unread_total !== 0) {
                     $("#inboxCount").html(data.unread_total);
                     $("#inboxCount").show();
-                }
-
-                if(data.trash_total !== 0) {
-                    $("#trashCount").html(data.unread_total);
-                    $("#trashCount").show();
                 }
             }
         });

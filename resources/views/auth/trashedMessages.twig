@@ -23,7 +23,8 @@
                 <hr>
                 <ul class="nav nav-pills nav-stacked">
                     <li><a href="{{ path_for('auth.messages') }}"><span class="badge pull-right" id="inboxCount">0</span> Inbox</a></li>
-                    <li class="active"><a href="#"><span class="badge pull-right" id="trashCount">0</span> Trash </a></li>
+                    <li><a href="{{ path_for('auth.messages.sent') }}"> Sent </a></li>
+                    <li class="active"><a href="#">Trash </a></li>
                 </ul>
             </div>
             <div class="col-sm-9 col-md-10">
@@ -158,7 +159,6 @@
         var selectedMessages = [];
 
         $("#inboxCount").hide();
-        $("#trashCount").hide();
 
         $.ajax({
             url: "{{ path_for('api.messages') }}",
@@ -167,11 +167,6 @@
                 if(data.unread_total !== 0) {
                     $("#inboxCount").html(data.unread_total);
                     $("#inboxCount").show();
-                }
-
-                if(data.trash_total !== 0) {
-                    $("#trashCount").html(data.trash_total);
-                    $("#trashCount").show();
                 }
             }
         });

@@ -221,125 +221,130 @@ class AuthController extends Controller {
     }
 
     /**
-     * Notifications
-     */
+    * Notifications
+    */
 
-     public function getNotifications() {
+    public function getNotifications() {
         return $this->render('auth/notifications');
-     }
+    }
 
-     /**
-      * Direct Messages
-      */
+    /**
+    * Direct Messages
+    */
 
-        public function getDirectMessages() {
-            // I guess we can do this here....
-            $usernamesIndex = $this->container->search->initIndex('demoapp_usernames');
-            $users = $this->container->user->select('users.id', 'users.username')->get();
+    public function getDirectMessages() {
+        // I guess we can do this here....
+        $usernamesIndex = $this->container->search->initIndex('demoapp_usernames');
+        $users = $this->container->user->select('users.id', 'users.username')->get();
 
-            $usernames = [];
+        $usernames = [];
 
-            foreach ($users as $user) {
-                $user['objectID'] = $user->id;
-                $user['username'] = $user->username;
-                array_push($usernames, $user);
-            }
-
-            $usernamesIndex->saveObjects($usernames);
-
-            $uMessagesForCount = $this->container->directMessage->where('receiver_id', $this->container->site->auth->id)->where('viewed', false)->where('deleted', false)->get();
-            $dMessagesForCount = $this->container->directMessage->where('receiver_id', $this->container->site->auth->id)->where('viewed', false)->where('deleted', true)->get();
-
-            return $this->render('auth/messages', [
-                'messages' => $this->container->site->auth->getDirectMessages(),
-            ]);
+        foreach ($users as $user) {
+            $user['objectID'] = $user->id;
+            $user['username'] = $user->username;
+            array_push($usernames, $user);
         }
 
-      public function getViewDirectMessage() {
-          $messageId = $this->request->getAttribute('id');
+        $usernamesIndex->saveObjects($usernames);
 
-          $rawMessage = $this->container->directMessage->where('id', $messageId)->first();
+        $uMessagesForCount = $this->container->directMessage->where('receiver_id', $this->container->site->auth->id)->where('viewed', false)->where('deleted', false)->get();
+        $dMessagesForCount = $this->container->directMessage->where('receiver_id', $this->container->site->auth->id)->where('viewed', false)->where('deleted', true)->get();
 
-          // Check to see if the message exists and if it does, is the user able to view it.
-          if(!$rawMessage || $rawMessage && $rawMessage->receiver_id !== $this->container->site->auth->id) {
-              return $this->redirectTo('auth.messages');
-          }
+        return $this->render('auth/messages', [
+            'messages' => $this->container->site->auth->getDirectMessages(),
+        ]);
+    }
 
-          $message = $this->container->directMessage->where('direct_messages.id', $messageId)
-            ->join('users', 'direct_messages.sender_id', '=', 'users.id')
-            ->select('direct_messages.*', 'users.username as sender_username', 'users.first_name as sender_first_name', 'users.last_name as sender_last_name')
-            ->first();
+    public function getViewDirectMessage() {
+        $messageId = $this->request->getAttribute('id');
 
-          $responses = $this->container->directMessageResponse->where('message_id', $message->id)
+        $rawMessage = $this->container->directMessage->where('id', $messageId)->first();
+
+        // Check to see if the message exists and if it does, is the user able to view it.
+        if(!$rawMessage || $rawMessage && $rawMessage->receiver_id !== $this->container->site->auth->id && $rawMessage->sender_id !== $this->container->site->auth->id) {
+            return $this->redirectTo('auth.messages');
+        }
+
+        $message = $this->container->directMessage->where('direct_messages.id', $messageId)
+            ->join('users as sender', 'direct_messages.sender_id', '=', 'sender.id')
+            ->join('users as receiver', 'direct_messages.receiver_id', '=', 'receiver.id')
+            ->select('direct_messages.*',
+                'sender.username as sender_username',
+                'sender.first_name as sender_first_name',
+                'sender.last_name as sender_last_name',
+                'receiver.username as receiver_username',
+                'receiver.first_name as receiver_first_name',
+                'receiver.last_name as receiver_last_name')->first();
+
+        $responses = $this->container->directMessageResponse->where('message_id', $message->id)
             ->join('users', 'direct_messages_responses.sender_id', '=', 'users.id')
             ->select('direct_messages_responses.*', 'users.username as owner_username', 'users.first_name as owner_first_name', 'users.last_name as owner_last_name')
             ->orderBy('created_at', 'DESC')
             ->get();
 
-          $message->update([
-              'viewed' => true,
-          ]);
+        if(!$this->container->flash->getMessage('notySuccess')[0])
+            $message->setViewed();
 
-          return $this->render('auth/viewMessage', [
-              'message' => $message,
-              'responses' => $responses,
-          ]);
-      }
+        return $this->render('auth/viewMessage', [
+            'message' => $message,
+            'responses' => $responses,
+        ]);
+    }
 
 
-      public function postComposeMessage() {
-          if($this->data() === null) {
-              $this->flashNow('error', 'Please fill out the fields!');
-              return $this->redirectTo('auth.messages');
-          } else {
-              $validator = $this->getValidator();
+    public function postComposeMessage() {
+        if($this->data() === null) {
+            $this->flashNow('error', 'Please fill out the fields!');
+            return $this->redirectTo('auth.messages');
+        } else {
+            $validator = $this->getValidator();
 
-              $data = [
-                  'message_recipient' => $this->data()->message_recipient,
-                  'message_subject' => $this->data()->message_subject,
-                  'message_body' => $this->data()->message_body,
-              ];
+            $data = [
+                'message_recipient' => $this->data()->message_recipient,
+                'message_subject' => $this->data()->message_subject,
+                'message_body' => $this->data()->message_body,
+            ];
 
-              $validator->validate([
-                  'message_recipient|Recipient' => [$data['message_recipient'], 'required|validUsername|notAuthUsername'],
-                  'message_subject|Subject' => [$data['message_subject'], 'required'],
-                  'message_body|Message' => [$data['message_body'], 'required'],
-              ]);
+            $validator->validate([
+                'message_recipient|Recipient' => [$data['message_recipient'], 'required|validUsername|notAuthUsername'],
+                'message_subject|Subject' => [$data['message_subject'], 'required'],
+                'message_body|Message' => [$data['message_body'], 'required'],
+            ]);
 
-              if($validator->passes()) {
-                  $userTo = $this->container->user->where('username', $this->data()->message_recipient)->first();
+            if($validator->passes()) {
+                $userTo = $this->container->user->where('username', $this->data()->message_recipient)->first();
 
-                  if($userTo) {
-                      $this->container->directMessage->sendMessage(
-                      $userTo->id,
-                      $this->container->site->auth->id,
-                      $this->data()->message_subject,
-                      $this->data()->message_body);
+                if($userTo) {
+                    $this->container->directMessage->sendMessage(
+                    $userTo->id,
+                    $this->container->site->auth->id,
+                    $this->data()->message_subject,
+                    $this->data()->message_body);
 
-                      $this->flash('notySuccess', 'Your message has been sent!');
-                      return $this->redirectTo('auth.messages');
-                  } else {
-                      // We should never reach this point... so I won't add all the posted data here.
-                      $this->flash('error', 'We could not find the user you selected.');
-                      return $this->redirectTo('auth.messages');
-                  }
-              } else {
-                  $this->flash('error', 'There were some errors while trying to send your message, please fix them and try again.');
+                    $this->flash('notySuccess', 'Your message has been sent!');
+                    return $this->redirectTo('auth.messages');
+                } else {
+                    // We should never reach this point... so I won't add all the posted data here.
+                    $this->flash('error', 'We could not find the user you selected.');
+                    return $this->redirectTo('auth.messages');
+                }
+            } else {
+                $this->flash('error', 'There were some errors while trying to send your message, please fix them and try again.');
 
-                  // These are the posted values
-                  $this->flash('recipient', $this->data()->message_recipient);
-                  $this->flash('subject', $this->data()->message_subject);
-                  $this->flash('body', $this->data()->message_body);
+                // These are the posted values
+                $this->flash('recipient', $this->data()->message_recipient);
+                $this->flash('subject', $this->data()->message_subject);
+                $this->flash('body', $this->data()->message_body);
 
-                  // These are the errors
-                  $this->flash('message_recipient_error', $validator->errors()->first('message_recipient'));
-                  $this->flash('message_subject_error', $validator->errors()->first('message_subject'));
-                  $this->flash('message_body_error', $validator->errors()->first('message_body'));
+                // These are the errors
+                $this->flash('message_recipient_error', $validator->errors()->first('message_recipient'));
+                $this->flash('message_subject_error', $validator->errors()->first('message_subject'));
+                $this->flash('message_body_error', $validator->errors()->first('message_body'));
 
-                  return $this->redirectTo('auth.messages');
-              }
-          }
-      }
+                return $this->redirectTo('auth.messages');
+            }
+        }
+    }
 
     public function postTrashDirectMessages() {
         $user = $this->container->site->auth;
@@ -350,7 +355,7 @@ class AuthController extends Controller {
         foreach($selectedMessages as $selectedMessage) {
             $message = $this->container->directMessage->where('id', $selectedMessage)->first();
 
-            if($user->id === $message->receiver_id) {
+            if($user->id == $message->receiver_id || $user->id == $message->sender_id) {
                 $message->update([
                     'deleted' => true,
                 ]);
@@ -390,9 +395,6 @@ class AuthController extends Controller {
     }
 
     public function getTrashedMessages() {
-        $uMessagesForCount = $this->container->directMessage->where('receiver_id', $this->container->site->auth->id)->where('viewed', false)->where('deleted', false)->get();
-        $dMessagesForCount = $this->container->directMessage->where('receiver_id', $this->container->site->auth->id)->where('viewed', false)->where('deleted', true)->get();
-
         return $this->render('auth/trashedMessages', [
             'messages' => $this->container->site->auth->getDirectMessages(true),
         ]);
@@ -413,7 +415,7 @@ class AuthController extends Controller {
         }
 
         if(count($selectedMessages) > 1)
-            $this->flash('notySuccess', "You have delete those messages, forever!");
+            $this->flash('notySuccess', "You have deleted those messages, forever!");
         else
             $this->flash('notySuccess', "You have deleted that message, forever!");
 
@@ -421,26 +423,43 @@ class AuthController extends Controller {
     }
 
     public function postDirectMessageResponse() {
-         $messageId = $this->request->getAttribute('id');
+        $messageId = $this->request->getAttribute('id');
 
-         $message = $this->container->directMessage->where('id', $messageId)->first();
+        $message = $this->container->directMessage->where('id', $messageId)->first();
 
-         if($message) {
-             $rawResponse = $this->data()->response;
+        if($message) {
+            $rawResponse = $this->data()->response;
 
-             $this->container->directMessageResponse->create([
-                 'message_id' => $messageId,
-                 'body' => $rawResponse,
-                 'sender_id' => $this->container->site->auth->id,
-             ]);
+            $this->container->directMessageResponse->create([
+                'message_id' => $messageId,
+                'body' => $rawResponse,
+                'sender_id' => $this->container->site->auth->id,
+            ]);
 
-             $this->flash('notySuccess', 'Your reply has been sent!');
+            $message->setHasReply();
 
-             return $this->redirectTo("auth.messages.view", [
-                 'id' => $message->id,
-             ]);
-         }
+            $this->flash('notySuccess', 'Your reply has been sent!');
 
-         return $this->redirectTo('auth.messages');
+            return $this->redirectTo("auth.messages.view", [
+                'id' => $message->id,
+            ]);
+        }
+
+        return $this->redirectTo('auth.messages');
+    }
+
+    public function getSentMessages() {
+        $sentMessages = $this->container->directMessage
+            ->join('users', 'direct_messages.receiver_id', '=', 'users.id')
+            ->select('direct_messages.*', 'users.username as sender_username', 'users.first_name as sender_first_name', 'users.last_name as sender_last_name')
+            ->where('sender_id', $this->container->site->auth->id)
+            ->orderBy('direct_messages.created_at', 'DESC')
+            ->get();
+
+
+
+        return $this->render('auth/sentMessages', [
+            'messages' => $sentMessages,
+        ]);
     }
 }
