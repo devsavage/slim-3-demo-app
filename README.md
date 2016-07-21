@@ -1,7 +1,6 @@
 # Slim 3 Demo App
 ## If you are looking for a Slim 3 starter app w/ authentication, please see my [Slim-3-Authentication](https://github.com/savageboy74/slim-3-authentication) repo! This project will have more features but won't be updated as often.
 Well, basically this project is a basic Slim 3 application with authentication.   
-You can view a live version of this project at [https://savageboy74.tv/demoapp/public/](https://savageboy74.tv/demoapp/public/) (It may not always be up to date!)    
 I am using Eloquent ORM for the database implementation. You can read more about Eloquent ORM [here](https://laravel.com/docs/master/eloquent).  
 I will continue to add more features as I see fit, soon.
 
